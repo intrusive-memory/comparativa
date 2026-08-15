@@ -213,13 +213,39 @@ def test_the_child_runs_generate_offline_at_parity_with_a_recorded_seed(tmp_path
 
 def test_peak_rss_samples_a_real_child_process():
     import subprocess
+    import time
 
+    # The child allocates, announces readiness on stdout, then blocks reading
+    # stdin. That gives the sampler a deterministic window to observe the
+    # allocation instead of racing the child's exit — closing stdin is what
+    # releases it, not a fixed sleep.
     child = subprocess.Popen(  # noqa: S603 - fixed argv
-        [sys.executable, "-c", "x = bytearray(64 * 1024 * 1024); print(len(x))"],
-        stdout=subprocess.DEVNULL,
+        [
+            sys.executable,
+            "-c",
+            "import sys\n"
+            "x = bytearray(64 * 1024 * 1024)\n"
+            "print(len(x), flush=True)\n"
+            "sys.stdin.readline()\n",
+        ],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
     )
     sampler = PeakRSS(child.pid, interval=0.005).start()
-    child.wait()
+    try:
+        ready = child.stdout.readline()
+        assert ready.strip() == str(64 * 1024 * 1024)
+
+        # Let the sampler take a few ticks while the child is parked on stdin.
+        deadline = time.monotonic() + 1.0
+        while sampler.result.samples < 3 and time.monotonic() < deadline:
+            time.sleep(0.005)
+        assert sampler.result.samples >= 3, "sampler never observed the child"
+    finally:
+        child.stdin.close()
+        child.wait(timeout=5)
+
     result = sampler.stop()
 
     assert result.ok
