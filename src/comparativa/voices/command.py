@@ -14,6 +14,9 @@ from .roster import RosterError, load_roster
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PRESETS_PATH = REPO_ROOT / PRESETS_FILENAME
 
+#: Where ``--audition`` writes its takes (gitignored, like every audio output).
+DEFAULT_AUDITION_DIR = "out/audition"
+
 
 def configure(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     """Add the ``voices`` arguments to the subparser built in ``cli.py``."""
@@ -41,6 +44,40 @@ def configure(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         choices=("table", "yaml"),
         default="table",
         help="Output format for stdout (default: table).",
+    )
+
+    audition = parser.add_argument_group("audition")
+    audition.add_argument(
+        "--audition",
+        action="store_true",
+        help=(
+            "Generate one fixed sentence per character x engine assignment "
+            "(loads each engine's checkpoint; slow)."
+        ),
+    )
+    audition.add_argument(
+        "--audition-out",
+        metavar="DIR",
+        default=DEFAULT_AUDITION_DIR,
+        help=f"Directory for the audition wavs (default: {DEFAULT_AUDITION_DIR}).",
+    )
+    audition.add_argument(
+        "--audition-text",
+        metavar="TEXT",
+        default=None,
+        help="Sentence to audition (default: the built-in fixed sentence).",
+    )
+    audition.add_argument(
+        "--audition-characters",
+        metavar="NAMES",
+        default=None,
+        help="Comma-separated subset of characters to audition (default: the whole cast).",
+    )
+    audition.add_argument(
+        "--audition-seed",
+        type=int,
+        default=None,
+        help="Base RNG seed for the audition; -1 leaves the RNG untouched.",
     )
     return parser
 
@@ -115,4 +152,48 @@ def handle(args: argparse.Namespace) -> int:
             )
         return 1
 
+    if args.audition:
+        return run_audition_from_args(args, assignments)
+
     return 0
+
+
+def run_audition_from_args(args: argparse.Namespace, assignments: Assignments) -> int:
+    """Handle ``--audition``: generate one fixed sentence per character × engine.
+
+    Imported lazily so the plain ``voices`` path never pays for mlx-audio.
+    """
+    from ..generation.audition import (
+        AUDITION_SEED,
+        AUDITION_TEXT,
+        format_table,
+        run_audition,
+        write_audition_manifest,
+    )
+
+    names = None
+    if args.audition_characters:
+        names = [n.strip() for n in str(args.audition_characters).split(",") if n.strip()]
+
+    by_character = {c.character: dict(c.voices) for c in assignments.characters}
+    seed = AUDITION_SEED if args.audition_seed is None else args.audition_seed
+    if seed is not None and seed < 0:
+        seed = None
+
+    print()
+    try:
+        run = run_audition(
+            by_character,
+            engine_keys=assignments.engine_keys,
+            characters=names,
+            out_dir=args.audition_out,
+            text=args.audition_text or AUDITION_TEXT,
+            seed=seed,
+        )
+    except (RuntimeError, ValueError, OSError) as exc:
+        print(f"error: audition failed: {exc}", file=sys.stderr)
+        return 1
+
+    print(format_table(run))
+    print(f"\nwrote {write_audition_manifest(run, args.audition_out)}")
+    return 0 if run.ok else 1

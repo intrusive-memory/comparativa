@@ -36,6 +36,7 @@ SUBCOMMAND_NAMES: tuple[str, ...] = tuple(name for name, _ in SUBCOMMANDS)
 _WIRED: dict[str, str] = {
     "parse": "comparativa.parsing.command",
     "voices": "comparativa.voices.command",
+    "generate": "comparativa.generation.command",
 }
 
 

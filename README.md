@@ -24,25 +24,33 @@ uv run comparativa --help
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `parse` | Parse a Fountain screenplay into a JSON element stream |
-| `voices` | Build the character roster and per-engine voice assignments |
-| `generate` | Generate episode audio for one engine condition |
-| `bench` | Run the benchmark matrix across conditions and episodes |
-| `listen` | Build a blinded listening set and scoring sheet |
-| `report` | Tabulate metrics and scores into a report |
+| Command | Purpose | Status |
+|---------|---------|--------|
+| `parse` | Parse a Fountain screenplay into a JSON element stream | implemented |
+| `voices` | Build the character roster and per-engine voice assignments (`--audition` generates a fixed sentence per character × engine) | implemented |
+| `generate` | Generate episode audio for one engine condition | implemented |
+| `bench` | Run the benchmark matrix across conditions and episodes | stub |
+| `listen` | Build a blinded listening set and scoring sheet | stub |
+| `report` | Tabulate metrics and scores into a report | stub |
 
-All six subcommands are currently scaffolding stubs; they are implemented by
-later sorties.
+```sh
+# Generate an episode (offline; all checkpoints are cached locally)
+HF_HUB_OFFLINE=1 uv run comparativa generate \
+    ~/Projects/podcasts/granville/episodes/episode_1_01_cold_open.fountain \
+    --engine qwen3-0.6b -o out/
+```
 
 ## Tests
 
 ```sh
-uv run pytest
+uv run pytest            # fast unit suite, no checkpoints loaded
+uv run pytest --smoke    # + engine smoke and the full-episode integration test
 ```
 
 ## Planning documents
 
 - `REQUIREMENTS.md` — locked requirements
 - `EXECUTION_PLAN.md` — mission plan and sortie breakdown
+- `docs/TEXT_PREP.md` — TTS text preparation and its Swift-stack parity
+- `docs/SAMPLING_PARITY.md` — sampling parameters traced to `GenerationSettings.swift`
+- `docs/ASSEMBLY.md` — episode assembly, loudness, and the `manifest.json` schema
