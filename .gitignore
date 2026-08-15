@@ -1,0 +1,20 @@
+# Generation and benchmark outputs
+out/
+bench/
+
+# Audio artifacts (never committed; they belong in out/ or bench/)
+*.wav
+*.m4a
+
+# Python environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# macOS
+.DS_Store
