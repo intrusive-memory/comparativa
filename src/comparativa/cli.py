@@ -37,6 +37,8 @@ _WIRED: dict[str, str] = {
     "parse": "comparativa.parsing.command",
     "voices": "comparativa.voices.command",
     "generate": "comparativa.generation.command",
+    "listen": "comparativa.eval.listen_command",
+    "report": "comparativa.eval.report_command",
 }
 
 
