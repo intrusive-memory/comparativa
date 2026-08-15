@@ -1,15 +1,19 @@
 """Console entry point for ``comparativa``.
 
-Sortie 1 scaffold: every subcommand is a stub that prints its own help and
-exits 0. Later sorties replace the ``_stub`` handlers with real
-implementations; the command surface itself is fixed here.
+The command surface is fixed by :data:`SUBCOMMANDS`. A subcommand starts life
+as a stub that prints its own help and exits 0; a sortie wires up the real
+implementation by adding an entry to :data:`_WIRED`, which supplies a
+``configure(parser)`` hook for the subcommand's arguments and a
+``handle(args) -> int`` handler. Wiring is imported lazily so that ``--help``
+never pays for a heavyweight module import.
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 
 from . import __version__
 
@@ -27,10 +31,33 @@ SUBCOMMANDS: tuple[tuple[str, str], ...] = (
 SUBCOMMAND_NAMES: tuple[str, ...] = tuple(name for name, _ in SUBCOMMANDS)
 
 
-def _stub(parser: argparse.ArgumentParser) -> int:
+#: Subcommand name -> module implementing ``configure`` and ``handle``.
+#: Each sortie adds its own entry as it lands.
+_WIRED: dict[str, str] = {
+    "parse": "comparativa.parsing.command",
+}
+
+
+def _stub(args: argparse.Namespace) -> int:
     """Placeholder handler: print the subcommand's help and succeed."""
-    parser.print_help()
+    args.parser.print_help()
     return 0
+
+
+#: A wired subcommand's ``(configure, handle)`` pair.
+Wiring = tuple[
+    Callable[[argparse.ArgumentParser], None],
+    Callable[[argparse.Namespace], int],
+]
+
+
+def _wiring(name: str) -> Wiring | None:
+    """Import the module implementing ``name``, or ``None`` if it is a stub."""
+    module_path = _WIRED.get(name)
+    if module_path is None:
+        return None
+    module = importlib.import_module(module_path)
+    return module.configure, module.handle
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -51,7 +78,13 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", metavar="COMMAND")
     for name, help_text in SUBCOMMANDS:
         sub = subparsers.add_parser(name, help=help_text, description=help_text)
-        sub.set_defaults(handler=_stub, parser=sub)
+        wiring = _wiring(name)
+        if wiring is None:
+            sub.set_defaults(handler=_stub, parser=sub)
+        else:
+            configure, handle = wiring
+            configure(sub)
+            sub.set_defaults(handler=handle, parser=sub)
 
     return parser
 
@@ -66,7 +99,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     handler = args.handler
-    return handler(args.parser)
+    return handler(args)
 
 
 if __name__ == "__main__":  # pragma: no cover - exercised via the console script
