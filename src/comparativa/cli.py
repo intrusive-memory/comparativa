@@ -35,6 +35,7 @@ SUBCOMMAND_NAMES: tuple[str, ...] = tuple(name for name, _ in SUBCOMMANDS)
 #: Each sortie adds its own entry as it lands.
 _WIRED: dict[str, str] = {
     "parse": "comparativa.parsing.command",
+    "voices": "comparativa.voices.command",
 }
 
 

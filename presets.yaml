@@ -1,0 +1,512 @@
+schema_version: 1
+generated_by: comparativa voices --write
+policy: 'Round 1 is defaults-only (EXECUTION_PLAN.md RD-2): built-in/default voices only, auto-assigned
+  from CAST.md voicePrompt keywords. voices.voxalta paths are recorded for the future cloning mission
+  and are never opened.'
+source:
+  project_dir: ~/Projects/podcasts/granville
+  cast_file: CAST.md
+  cast_sha256: eb4665acd70d696c5f5894c83bb6492fe420086d6ae6b35a9ce318623c13daba
+  cast_size: 25
+engines:
+  qwen3-1.7b:
+    checkpoint: mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-bf16
+    role: condition C (Python qwen3 presets)
+    multi_voice: true
+    voices_verified_locally: true
+    voice_list_source: spk_id map in the checkpoint config.json (read from the local HF cache); consumed
+      by mlx_audio/tts/models/qwen3_tts/qwen3_tts.py:193
+    voices:
+    - name: serena
+      gender: female
+      age_band: adult
+      language: zh
+      assignable: true
+    - name: vivian
+      gender: female
+      age_band: adult
+      language: zh
+      assignable: true
+    - name: uncle_fu
+      gender: male
+      age_band: elder
+      language: zh
+      assignable: true
+      note: Elder-presenting Chinese storyteller preset.
+    - name: ryan
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: aiden
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: ono_anna
+      gender: female
+      age_band: adult
+      language: ja
+      assignable: true
+      note: Present in spk_id but undocumented in the mlx-audio README; language inferred from the name.
+    - name: sohee
+      gender: female
+      age_band: adult
+      language: ko
+      assignable: true
+      note: Present in spk_id but undocumented in the mlx-audio README; language inferred from the name.
+    - name: eric
+      gender: male
+      age_band: adult
+      language: zh
+      assignable: false
+      note: spk_is_dialect='sichuan_dialect'. qwen3_tts.py:397-406 forces the Sichuan language id whenever
+        language is chinese/auto, which would corrupt English dialogue. Excluded from auto-assignment.
+    - name: dylan
+      gender: male
+      age_band: adult
+      language: zh
+      assignable: false
+      note: spk_is_dialect='beijing_dialect'. Same forced-dialect behaviour as eric. Excluded from auto-assignment.
+  qwen3-0.6b:
+    checkpoint: mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-bf16
+    role: size-degradation probe / integration tests
+    multi_voice: true
+    voices_verified_locally: false
+    voice_list_source: spk_id map in the checkpoint config.json (read from the local HF cache); consumed
+      by mlx_audio/tts/models/qwen3_tts/qwen3_tts.py:193 -- for 0.6B the speaker set is assumed identical
+      to 1.7B (qwen3_tts/README.md:136-142 documents one shared Base/CustomVoice speaker set); the 0.6B
+      checkpoint is NOT in the local HF cache (only refs/main), so this list could not be confirmed against
+      its own config.json
+    voices:
+    - name: serena
+      gender: female
+      age_band: adult
+      language: zh
+      assignable: true
+    - name: vivian
+      gender: female
+      age_band: adult
+      language: zh
+      assignable: true
+    - name: uncle_fu
+      gender: male
+      age_band: elder
+      language: zh
+      assignable: true
+      note: Elder-presenting Chinese storyteller preset.
+    - name: ryan
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: aiden
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: ono_anna
+      gender: female
+      age_band: adult
+      language: ja
+      assignable: true
+      note: Present in spk_id but undocumented in the mlx-audio README; language inferred from the name.
+    - name: sohee
+      gender: female
+      age_band: adult
+      language: ko
+      assignable: true
+      note: Present in spk_id but undocumented in the mlx-audio README; language inferred from the name.
+    - name: eric
+      gender: male
+      age_band: adult
+      language: zh
+      assignable: false
+      note: spk_is_dialect='sichuan_dialect'. qwen3_tts.py:397-406 forces the Sichuan language id whenever
+        language is chinese/auto, which would corrupt English dialogue. Excluded from auto-assignment.
+    - name: dylan
+      gender: male
+      age_band: adult
+      language: zh
+      assignable: false
+      note: spk_is_dialect='beijing_dialect'. Same forced-dialect behaviour as eric. Excluded from auto-assignment.
+  chatterbox:
+    checkpoint: mlx-community/chatterbox-fp16
+    role: condition D (Python chatterbox default)
+    multi_voice: false
+    voices_verified_locally: true
+    voice_list_source: conds.safetensors in the checkpoint; mlx_audio/tts/models/chatterbox/chatterbox.py:608-647
+    voices:
+    - name: default
+      gender: neutral
+      age_band: any
+      language: en
+      assignable: true
+      note: Pre-computed conds.safetensors shipped with the checkpoint (chatterbox.py:608-647).
+  chatterbox-turbo:
+    checkpoint: mlx-community/chatterbox-turbo-fp16
+    role: optional speed probe
+    multi_voice: false
+    voices_verified_locally: true
+    voice_list_source: conds.safetensors in the checkpoint; mlx_audio/tts/models/chatterbox_turbo/chatterbox_turbo.py:317
+    voices:
+    - name: default
+      gender: neutral
+      age_band: any
+      language: en
+      assignable: true
+      note: '''builtin_voice'' conds.safetensors (chatterbox_turbo.py:317).'
+  soprano:
+    checkpoint: mlx-community/Soprano-80M-bf16
+    role: condition E (Python Soprano, paired with Swift condition F)
+    multi_voice: false
+    voices_verified_locally: true
+    voice_list_source: mlx_audio/tts/models/soprano/soprano.py:365,377,387 -- voice argument unused
+    voices:
+    - name: default
+      gender: neutral
+      age_band: any
+      language: en
+      assignable: true
+      note: Soprano's only voice; the `voice` argument is discarded (soprano.py:387).
+assignments:
+  ARCHER:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/ARCHER.vox
+  BECKETT:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: aiden
+      qwen3-0.6b: aiden
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/BECKETT.vox
+  CLARK:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: uncle_fu
+      qwen3-0.6b: uncle_fu
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/CLARK.vox
+  CYRUS:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/CYRUS.vox
+  DONNA:
+    gender: female
+    gender_source: prompt:explicit-gender-word
+    age_band: elder
+    age_source: prompt:elder-cue
+    engines:
+      qwen3-1.7b: serena
+      qwen3-0.6b: serena
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/DONNA.vox
+    notes:
+    - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''serena'''
+    - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''serena'''
+  DUKE:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: elder
+    age_source: prompt:elder-cue
+    engines:
+      qwen3-1.7b: uncle_fu
+      qwen3-0.6b: uncle_fu
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/DUKE.vox
+  GARETH:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: aiden
+      qwen3-0.6b: aiden
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/GARETH.vox
+  HUNTER:
+    gender: male
+    gender_source: prompt:voice-type-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: uncle_fu
+      qwen3-0.6b: uncle_fu
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/HUNTER.vox
+  IOLA:
+    gender: female
+    gender_source: prompt:explicit-gender-word
+    age_band: elder
+    age_source: prompt:elder-cue
+    engines:
+      qwen3-1.7b: vivian
+      qwen3-0.6b: vivian
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/IOLA.vox
+    notes:
+    - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''vivian'''
+    - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''vivian'''
+  JOANN:
+    gender: female
+    gender_source: prompt:voice-type-word
+    age_band: elder
+    age_source: prompt:elder-cue
+    engines:
+      qwen3-1.7b: ono_anna
+      qwen3-0.6b: ono_anna
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/JOANN.vox
+    notes:
+    - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''ono_anna'''
+    - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''ono_anna'''
+  KEVIN:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/KEVIN.vox
+  KIERAN:
+    gender: male
+    gender_source: prompt:voice-type-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: aiden
+      qwen3-0.6b: aiden
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/KIERAN.vox
+  LEROY:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: elder
+    age_source: prompt:elder-cue
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/LEROY.vox
+    notes:
+    - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''ryan'''
+    - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''ryan'''
+  LINC:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: uncle_fu
+      qwen3-0.6b: uncle_fu
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/LINC.vox
+  MARSHALL:
+    gender: male
+    gender_source: prompt:low-register-cue
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/MARSHALL.vox
+  NARRATOR:
+    gender: male
+    gender_source: prompt:voice-type-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: aiden
+      qwen3-0.6b: aiden
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/NARRATOR.vox
+  PREDATOR MOM 1:
+    gender: female
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: serena
+      qwen3-0.6b: serena
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/PREDATOR_MOM_1.vox
+  PREDATOR MOM 2:
+    gender: female
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: vivian
+      qwen3-0.6b: vivian
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/PREDATOR_MOM_2.vox
+  PREDATOR MOM 3:
+    gender: female
+    gender_source: character-name-hint
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: ono_anna
+      qwen3-0.6b: ono_anna
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/PREDATOR_MOM_3.vox
+  PRINCIPAL:
+    gender: female
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: sohee
+      qwen3-0.6b: sohee
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/PRINCIPAL.vox
+  RAY:
+    gender: male
+    gender_source: prompt:voice-type-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: uncle_fu
+      qwen3-0.6b: uncle_fu
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/RAY.vox
+  SHANE:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/SHANE.vox
+  SPENCER:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: aiden
+      qwen3-0.6b: aiden
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/SPENCER.vox
+  TOBY:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: child
+    age_source: prompt:child-cue
+    engines:
+      qwen3-1.7b: ryan
+      qwen3-0.6b: ryan
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/TOBY.vox
+    notes:
+    - 'qwen3-1.7b: no child preset available; fell back to the adult voice ''ryan'''
+    - 'qwen3-0.6b: no child preset available; fell back to the adult voice ''ryan'''
+  TUCKER:
+    gender: male
+    gender_source: prompt:explicit-gender-word
+    age_band: adult
+    age_source: default
+    engines:
+      qwen3-1.7b: uncle_fu
+      qwen3-0.6b: uncle_fu
+      chatterbox: default
+      chatterbox-turbo: default
+      soprano: default
+    voxalta:
+    - voices/TUCKER.vox
