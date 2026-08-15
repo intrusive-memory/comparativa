@@ -1,6 +1,8 @@
-# Generation and benchmark outputs
-out/
-bench/
+# Generation and benchmark outputs. Anchored at the repository root: an
+# unanchored `bench/` would also swallow the runner's source package
+# (src/comparativa/bench/).
+/out/
+/bench/
 
 # Audio artifacts (never committed; they belong in out/ or bench/)
 *.wav
