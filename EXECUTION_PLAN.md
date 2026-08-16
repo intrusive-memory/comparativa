@@ -1,5 +1,9 @@
 ---
 type: execution-plan
+feature_name: OPERATION BATTLING BARDS
+starting_point_commit: 84edd15cba0b7ac5f925feee60ffba0b554c18fe
+mission_branch: mission/battling-bards/01
+iteration: 1
 ---
 
 # EXECUTION_PLAN.md — Comparativa
