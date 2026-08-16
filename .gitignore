@@ -18,5 +18,10 @@ __pycache__/
 build/
 dist/
 
+# The signed `produciesta` binary is a coverage-instrumented build and drops an
+# LLVM profile in whatever directory it is launched from; the condition-A
+# wrapper runs from the repo root, so this lands here.
+default.profraw
+
 # macOS
 .DS_Store
