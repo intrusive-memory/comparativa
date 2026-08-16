@@ -101,6 +101,33 @@ def _load_json(path: Path) -> dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
+def _load_metrics_entry(path: Path, *, condition: str, episode: str) -> dict[str, Any]:
+    """Load the one entry that matches ``(condition, episode)`` from a
+    ``metrics.json``.
+
+    ``metrics.json`` is written as a schema-version-1 **envelope** —
+    ``{"schema_version": 1, ..., "entries": [...]}`` (see
+    :mod:`comparativa.bench.metrics`) — and a single file may hold more than
+    one entry (e.g. Sortie 8's ``bench/A/metrics.json`` covering both
+    episodes). Reading the envelope itself as if it *were* an entry silently
+    yields ``None`` for every field (``engine``, ``checkpoint``, ``stack``)
+    since none of those keys exist at the envelope's top level. This also
+    tolerates a bare single-entry dict (no ``entries`` wrapper), the shape
+    older fixtures use.
+    """
+    doc = _load_json(path)
+    entries = doc.get("entries")
+    if isinstance(entries, list):
+        dict_entries = [e for e in entries if isinstance(e, dict)]
+        for entry in dict_entries:
+            if entry.get("condition") == condition and entry.get("episode") == episode:
+                return entry
+        # No exact (condition, episode) match — fall back to the first entry
+        # rather than an empty dict, so the run still gets *some* fields.
+        return dict_entries[0] if dict_entries else {}
+    return doc
+
+
 def _find_audio(episode_dir: Path, manifest: dict[str, Any]) -> Path | None:
     """Prefer the manifest's recorded ``.wav`` output; fall back to a glob."""
     outputs = manifest.get("outputs")
@@ -134,7 +161,7 @@ def discover_clips(bench_dir: str | Path) -> list[Clip]:
         manifest_path = episode_dir / "manifest.json"
         metrics_path = episode_dir / "metrics.json"
         manifest = _load_json(manifest_path)
-        metrics = _load_json(metrics_path)
+        metrics = _load_metrics_entry(metrics_path, condition=condition, episode=episode)
 
         audio_path = _find_audio(episode_dir, manifest)
         if audio_path is None:

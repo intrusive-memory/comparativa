@@ -143,6 +143,77 @@ def test_discover_clips_empty_bench_dir_yields_nothing(tmp_path: Path) -> None:
     assert discover_clips(tmp_path / "empty-bench") == []
 
 
+def test_discover_clips_resolves_stack_engine_checkpoint_from_envelope(
+    tmp_path: Path,
+) -> None:
+    """``metrics.json`` is a schema_version-1 envelope (``{"entries": [...]}``),
+    not a bare entry. Reading it as a bare entry silently yields ``None`` for
+    ``engine``/``stack``/``checkpoint`` in the key file — the Sortie 9 bug
+    this test guards against.
+    """
+    bench = tmp_path / "bench"
+    episode_dir = bench / "C" / "ep1"
+    _write_wav(episode_dir / "ep1.wav")
+    envelope = {
+        "schema_version": 1,
+        "generated_by": "comparativa bench",
+        "written_at": "2026-08-15T23:53:35+00:00",
+        "entries": [
+            {
+                "condition": "C",
+                "stack": "python",
+                "engine": "qwen3-1.7b",
+                "checkpoint": "mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-bf16",
+                "episode": "ep1",
+            }
+        ],
+    }
+    (episode_dir / "metrics.json").write_text(json.dumps(envelope), encoding="utf-8")
+
+    clips = discover_clips(bench)
+    assert len(clips) == 1
+    clip = clips[0]
+    assert clip.stack == "python"
+    assert clip.engine == "qwen3-1.7b"
+    assert clip.checkpoint == "mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-bf16"
+
+
+def test_discover_clips_envelope_with_multiple_entries_matches_by_episode(
+    tmp_path: Path,
+) -> None:
+    """A single metrics.json (e.g. Sortie 8's per-condition file) can hold
+    entries for more than one episode; discover_clips must pick the entry
+    matching this episode dir, not just the first one in the list.
+    """
+    bench = tmp_path / "bench"
+    episode_dir = bench / "A" / "ep2"
+    _write_wav(episode_dir / "ep2.wav")
+    envelope = {
+        "schema_version": 1,
+        "entries": [
+            {
+                "condition": "A",
+                "stack": "swift",
+                "engine": "produciesta",
+                "checkpoint": "ckpt-ep1",
+                "episode": "ep1",
+            },
+            {
+                "condition": "A",
+                "stack": "swift",
+                "engine": "produciesta",
+                "checkpoint": "ckpt-ep2",
+                "episode": "ep2",
+            },
+        ],
+    }
+    (episode_dir / "metrics.json").write_text(json.dumps(envelope), encoding="utf-8")
+
+    clips = discover_clips(bench)
+    assert len(clips) == 1
+    assert clips[0].checkpoint == "ckpt-ep2"
+
+
 # ---------------------------------------------------------------------------
 # listen / blinding
 # ---------------------------------------------------------------------------
