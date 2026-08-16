@@ -21,13 +21,15 @@ from comparativa.cli import main
 from comparativa.parsing import ElementType, parse_file, parse_text
 from comparativa.parsing.fountain import PARSER_NAME
 
-CORPUS = Path("~/Projects/podcasts/granville/episodes").expanduser()
+from conftest import CORPUS_ROOT
+
+CORPUS = CORPUS_ROOT / "episodes"
 COLD_OPEN = CORPUS / "episode_1_01_cold_open.fountain"
 BUMPER = CORPUS / "episode_1_01a_bumper_donnie_and_arnie_1.fountain"
 
 requires_corpus = pytest.mark.skipif(
     not (COLD_OPEN.is_file() and BUMPER.is_file()),
-    reason=f"granville corpus not present at {CORPUS}",
+    reason=f"mission corpus not present at {CORPUS}",
 )
 
 # Known anchors, read off the corpus files by hand.

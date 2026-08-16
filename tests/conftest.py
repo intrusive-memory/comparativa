@@ -14,11 +14,47 @@ file. Smoke tests load real MLX checkpoints and take minutes, so they are
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
 
 #: Environment variable that enables smoke tests without a CLI flag.
 SMOKE_ENV_VAR = "COMPARATIVA_SMOKE"
+
+#: Environment variable used to override corpus resolution entirely (CI, or a
+#: developer machine with the corpus checked out somewhere unusual).
+CORPUS_ROOT_ENV_VAR = "COMPARATIVA_CORPUS_ROOT"
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def resolve_corpus_root() -> Path:
+    """Single resolution point for "where is the mission corpus".
+
+    OPERATION BATTLING BARDS benchmarks against the granville corpus. That live
+    tree is mutated by other sessions outside this mission's control, so the
+    supervisor extracted a verified, mission-consistent snapshot into
+    ``corpus/frozen/`` (see ``docs/CORPUS_PIN.md``). Resolution order:
+
+    1. ``$COMPARATIVA_CORPUS_ROOT``, if set — explicit override.
+    2. ``<repo>/corpus/frozen``, if it exists — the pinned snapshot.
+    3. ``~/Projects/podcasts/granville`` — last-resort fallback for a machine
+       without the frozen snapshot (tests then skip via each file's
+       ``requires_corpus``-style marker if that path is also absent).
+    """
+    override = os.environ.get(CORPUS_ROOT_ENV_VAR)
+    if override:
+        return Path(override).expanduser().resolve()
+
+    frozen = REPO_ROOT / "corpus" / "frozen"
+    if frozen.is_dir():
+        return frozen
+
+    return Path("~/Projects/podcasts/granville").expanduser()
+
+
+#: The resolved corpus root, computed once at collection time.
+CORPUS_ROOT = resolve_corpus_root()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

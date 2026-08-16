@@ -48,12 +48,14 @@ from comparativa.bench.conditions import BENCH_SPEECH_POLICY
 from comparativa.cli import main as cli_main
 from comparativa.generation.engines import ENGINE_SPECS
 
-GRANVILLE = Path("~/Projects/podcasts/granville").expanduser()
+from conftest import CORPUS_ROOT
+
+GRANVILLE = CORPUS_ROOT
 BUMPER_ID = "episode_1_01a_bumper_donnie_and_arnie_1"
 BUMPER = GRANVILLE / "episodes" / f"{BUMPER_ID}.fountain"
 
 corpus = pytest.mark.skipif(
-    not BUMPER.is_file(), reason=f"granville corpus not present at {GRANVILLE}"
+    not BUMPER.is_file(), reason=f"mission corpus not present at {GRANVILLE}"
 )
 
 
@@ -125,10 +127,23 @@ def test_an_episode_resolves_by_id_filename_path_and_unique_substring():
     assert resolve_episode(GRANVILLE, "bumper_donnie_and_arnie_1") == by_id
 
 
-@corpus
-def test_an_ambiguous_or_unknown_episode_is_refused():
+def test_an_ambiguous_episode_substring_is_refused(tmp_path):
+    # The frozen corpus (docs/CORPUS_PIN.md) intentionally carries only the
+    # two episodes this mission benchmarks, so it can't exercise a genuine
+    # substring collision on its own; the live granville tree has several
+    # "bumper" episodes but is explicitly out of scope post-freeze. Ambiguity
+    # resolution is a content-independent property of resolve_episode, so a
+    # synthetic two-file project proves it without depending on either tree.
+    episodes = tmp_path / "episodes"
+    episodes.mkdir()
+    (episodes / "episode_1_01a_bumper_donnie_and_arnie_1.fountain").write_text("")
+    (episodes / "episode_1_02a_bumper_donnie_and_arnie_2.fountain").write_text("")
     with pytest.raises(BenchError, match="ambiguous"):
-        resolve_episode(GRANVILLE, "bumper")
+        resolve_episode(tmp_path, "bumper")
+
+
+@corpus
+def test_an_unknown_episode_is_refused():
     with pytest.raises(BenchError, match="not found"):
         resolve_episode(GRANVILLE, "episode_9_99_nope")
 

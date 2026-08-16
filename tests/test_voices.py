@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -25,12 +26,14 @@ from comparativa.voices import (
 )
 from comparativa.voices.command import DEFAULT_PRESETS_PATH
 
-GRANVILLE = Path("~/Projects/podcasts/granville").expanduser()
+from conftest import CORPUS_ROOT
+
+GRANVILLE = CORPUS_ROOT
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 requires_granville = pytest.mark.skipif(
     not (GRANVILLE / "CAST.md").is_file(),
-    reason="granville corpus not available on this machine",
+    reason="mission corpus not available (see docs/CORPUS_PIN.md)",
 )
 
 
@@ -163,12 +166,27 @@ def test_child_character_is_not_given_the_elder_preset(granville_roster):
 # --- presets.yaml ------------------------------------------------------------
 
 
+#: ``source.project_dir`` records wherever the roster was *loaded from*, not
+#: the cast content — it legitimately differs between the frozen corpus
+#: snapshot tests now read (docs/CORPUS_PIN.md) and wherever the committed
+#: presets.yaml was originally generated from. Normalize it out before the
+#: byte-equality check below so this test measures what it says it measures:
+#: CAST.md content, not the invoking machine's directory layout.
+_PROJECT_DIR_LINE = re.compile(r"^  project_dir: .*$", re.MULTILINE)
+
+
 @requires_granville
 def test_presets_file_is_committed_and_current(granville_roster, presets):
     """The committed presets.yaml matches a fresh regeneration from CAST.md."""
     assert DEFAULT_PRESETS_PATH.is_file()
     regenerated = dump_yaml(to_document(assign(granville_roster)))
-    assert DEFAULT_PRESETS_PATH.read_text(encoding="utf-8") == regenerated
+    committed = DEFAULT_PRESETS_PATH.read_text(encoding="utf-8")
+    assert _PROJECT_DIR_LINE.sub("  project_dir: <ignored>", committed) == (
+        _PROJECT_DIR_LINE.sub("  project_dir: <ignored>", regenerated)
+    )
+    # The part of "source" that actually proves currency: the cast content
+    # itself, hashed, must be identical to what generated the committed file.
+    assert presets["source"]["cast_sha256"] == granville_roster.cast_sha256
 
 
 @requires_granville

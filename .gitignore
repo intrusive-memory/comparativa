@@ -4,6 +4,10 @@
 /out/
 /bench/
 
+# Frozen corpus snapshot (see docs/CORPUS_PIN.md). Extracted read-only from the
+# granville project's git history; stays untracked, like bench/.
+/corpus/
+
 # Audio artifacts (never committed; they belong in out/ or bench/)
 *.wav
 *.m4a

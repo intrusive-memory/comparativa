@@ -47,7 +47,9 @@ from comparativa.parsing.textprep import (
     split_sentences,
 )
 
-GRANVILLE = Path("~/Projects/podcasts/granville").expanduser()
+from conftest import CORPUS_ROOT
+
+GRANVILLE = CORPUS_ROOT
 EPISODES = GRANVILLE / "episodes"
 COLD_OPEN = EPISODES / "episode_1_01_cold_open.fountain"
 BUMPER = EPISODES / "episode_1_01a_bumper_donnie_and_arnie_1.fountain"
@@ -57,7 +59,7 @@ DOC = Path(__file__).resolve().parents[1] / "docs" / "TEXT_PREP.md"
 
 requires_corpus = pytest.mark.skipif(
     not COLD_OPEN.is_file() or not CAST_MD.is_file(),
-    reason="granville corpus not present",
+    reason="mission corpus not present",
 )
 
 

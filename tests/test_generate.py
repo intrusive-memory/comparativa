@@ -40,7 +40,9 @@ from comparativa.generation import (
 from comparativa.generation.assembly import LOUDNESS_BLOCK_SECONDS, SILENCE_THRESHOLD
 from comparativa.generation.episode import DEFAULT_PRESETS_PATH, SEED_STRIDE
 
-GRANVILLE = Path("~/Projects/podcasts/granville").expanduser()
+from conftest import CORPUS_ROOT
+
+GRANVILLE = CORPUS_ROOT
 COLD_OPEN = GRANVILLE / "episodes" / "episode_1_01_cold_open.fountain"
 BUMPER = GRANVILLE / "episodes" / "episode_1_01a_bumper_donnie_and_arnie_1.fountain"
 
@@ -51,7 +53,7 @@ TEST_ENGINE = "qwen3-0.6b"
 TEST_POLICY = "fr3"
 
 corpus = pytest.mark.skipif(
-    not COLD_OPEN.is_file(), reason=f"granville corpus not present at {GRANVILLE}"
+    not COLD_OPEN.is_file(), reason=f"mission corpus not present at {GRANVILLE}"
 )
 
 
