@@ -42,13 +42,39 @@ class MetricsRecord:
     data: dict[str, Any] = field(default_factory=dict)
 
 
+def _resolve_entry(raw: Any, dir_condition: str, dir_episode: str) -> dict[str, Any]:
+    """Unwrap a schema_version-1 envelope (``{"entries": [...]}}``) to the
+    entry for this run directory.
+
+    Sortie 7/8 write ``metrics.json`` as an envelope, not a bare entry
+    (see :mod:`comparativa.bench.metrics`); reading the envelope itself as
+    if it *were* an entry silently yields ``None`` for every field (``stack``,
+    ``engine``, ``performance``, ...) since none of those keys exist at the
+    envelope's top level. This also tolerates a bare single-entry dict (no
+    ``entries`` wrapper), the shape older fixtures use, mirroring
+    :func:`comparativa.eval.blind._resolve_entry`.
+    """
+    if not isinstance(raw, dict):
+        return {"_error": "metrics.json is not a JSON object"}
+    entries = raw.get("entries")
+    if isinstance(entries, list):
+        dict_entries = [e for e in entries if isinstance(e, dict)]
+        for entry in dict_entries:
+            if entry.get("condition") == dir_condition and entry.get("episode") == dir_episode:
+                return entry
+        # No exact (condition, episode) match — fall back to the first entry
+        # rather than an empty dict, so the run still gets *some* fields.
+        return dict_entries[0] if dict_entries else {}
+    return raw
+
+
 def discover_metrics(bench_dir: str | Path) -> list[MetricsRecord]:
     """Find every ``metrics.json`` under ``bench_dir``.
 
-    The condition and episode are read from ``metrics.json`` itself when
-    present, falling back to the directory names (``bench/<condition>/
-    <episode>/metrics.json``) so a minimal or malformed file still gets a
-    row instead of vanishing from the table.
+    The condition and episode are read from the resolved entry when present,
+    falling back to the directory names (``bench/<condition>/<episode>/
+    metrics.json``) so a minimal or malformed file still gets a row instead
+    of vanishing from the table.
     """
     bench_dir = Path(bench_dir)
     records: list[MetricsRecord] = []
@@ -68,7 +94,7 @@ def discover_metrics(bench_dir: str | Path) -> list[MetricsRecord]:
                 )
             )
             continue
-        data = raw if isinstance(raw, dict) else {"_error": "metrics.json is not a JSON object"}
+        data = _resolve_entry(raw, dir_condition, dir_episode)
         condition = str(data.get("condition") or dir_condition)
         episode = str(data.get("episode") or dir_episode)
         records.append(MetricsRecord(condition=condition, episode=episode, path=path, data=data))
@@ -99,6 +125,23 @@ def _fmt(value: Any) -> str:
     return str(value)
 
 
+def _perf(data: dict[str, Any], flat_key: str, nested_key: str) -> Any:
+    """A performance number, tolerant of both the frozen schema (nested
+    under ``performance``) and a flat bare-entry shape (older fixtures).
+
+    Checks the flat key first so an explicit top-level override still wins,
+    then falls back to ``performance.<nested_key>`` — where the frozen
+    ``metrics.json`` schema (docs/BENCH.md §4) actually carries
+    ``wall_seconds``, ``real_time_factor``, and ``peak_rss_bytes``.
+    """
+    if flat_key in data:
+        return data[flat_key]
+    performance = data.get("performance")
+    if isinstance(performance, dict):
+        return performance.get(nested_key)
+    return None
+
+
 def render_performance_table(records: list[MetricsRecord]) -> str:
     """Render the performance table: known columns + any extra numeric ones."""
     if not records:
@@ -125,9 +168,9 @@ def render_performance_table(records: list[MetricsRecord]) -> str:
             record.episode,
             _fmt(data.get("stack")),
             _fmt(data.get("engine")),
-            _fmt(data.get("wall_seconds")),
-            _fmt(data.get("rtf")),
-            _fmt(data.get("peak_rss_bytes")),
+            _fmt(_perf(data, "wall_seconds", "wall_seconds")),
+            _fmt(_perf(data, "rtf", "real_time_factor")),
+            _fmt(_perf(data, "peak_rss_bytes", "peak_rss_bytes")),
         ]
         row.extend(_fmt(data.get(name)) for name in extras)
         if has_errors:
