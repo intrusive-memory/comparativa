@@ -29,6 +29,7 @@ from .metrics import STATUS_FAILED, STATUS_OK, SUMMARY_FILENAME, write_metrics
 from .runner import (
     BenchError,
     BenchPlan,
+    condition_presets_path,
     execute,
     plan_runs,
     resolve_episodes,
@@ -144,11 +145,14 @@ def _dry_run(plan: BenchPlan, *, presets: str | None) -> int:
     failures = 0
     for run in plan.runs:
         engine = run.condition.engine or "-"
+        # A condition that pins its own presets file (B/G -> presets-cloned.yaml)
+        # must be validated against it, exactly as the child will run.
+        run_presets = condition_presets_path(run.condition) or presets
         try:
             episode_plan = build_plan(
                 run.episode.path,
                 engine,
-                presets_path=presets,
+                presets_path=run_presets,
                 speech_policy=run.speech_policy,
                 seed=run.seed,
             )

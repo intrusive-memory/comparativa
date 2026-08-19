@@ -345,14 +345,24 @@ def child_command(run: BenchRun, *, m4a: bool = True) -> list[str]:
         "--seed",
         str(run.seed),
     ]
-    if run.condition.presets:
-        presets = Path(run.condition.presets)
-        if not presets.is_absolute():
-            presets = REPO_ROOT / presets
+    presets = condition_presets_path(run.condition)
+    if presets is not None:
         command += ["--presets", str(presets)]
     if not m4a:
         command.append("--no-m4a")
     return command
+
+
+def condition_presets_path(condition: Condition) -> Path | None:
+    """A condition's own presets file (repo-root relative), when it names one.
+
+    The clone conditions (B, G) pin ``presets-cloned.yaml`` so the child run
+    and the ``--dry-run`` validation resolve voices from the same document.
+    """
+    if not condition.presets:
+        return None
+    presets = Path(condition.presets)
+    return presets if presets.is_absolute() else REPO_ROOT / presets
 
 
 def child_env() -> dict[str, str]:
