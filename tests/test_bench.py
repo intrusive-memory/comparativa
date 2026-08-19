@@ -93,36 +93,46 @@ def test_condition_b_is_the_vox_cloned_qwen3_pair_for_a():
     assert cond.engine == "qwen3-1.7b-clone"
     assert cond.checkpoint == "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16"
     assert cond.presets == "presets-cloned.yaml"
-    assert "B" in DEFAULT_CONDITIONS
+    # Retired from the default roster in round 3 (Qwen out of consideration),
+    # but still runnable by explicit id for the historical A-vs-B pair.
+    assert "B" not in DEFAULT_CONDITIONS
+    assert cond.runnable
 
 
-def test_condition_g_is_the_optional_chatterbox_clone_probe():
-    cond = CONDITIONS["G"]
-    assert cond.engine == "chatterbox"
-    assert cond.optional
-    assert cond.presets == "presets-cloned.yaml"
-    assert "G" not in DEFAULT_CONDITIONS
+def test_the_round_three_roster_is_the_default():
+    """The active comparison: cloned challengers + presets controls."""
+    assert DEFAULT_CONDITIONS == ("G", "H", "N", "S", "K", "O")
+    for cid, engine in (("G", "chatterbox"), ("H", "higgs"), ("N", "dia"), ("S", "csm")):
+        cond = CONDITIONS[cid]
+        assert cond.engine == engine
+        assert cond.presets == "presets-cloned.yaml"
+        assert not cond.optional
+    for cid, engine in (("K", "kokoro"), ("O", "orpheus")):
+        cond = CONDITIONS[cid]
+        assert cond.engine == engine
+        assert cond.presets is None  # preset engines read presets.yaml
 
 
 def test_the_turbo_speed_probe_is_optional_and_off_by_default():
     assert CONDITIONS["T"].engine == "chatterbox-turbo"
     assert CONDITIONS["T"].optional
     assert "T" not in DEFAULT_CONDITIONS
-    assert DEFAULT_CONDITIONS == ("B", "C", "D", "E")
 
 
 def test_conditions_parse_in_matrix_order_and_deduplicate():
     assert [c.id for c in parse_conditions("E,C,E")] == ["C", "E"]
     assert [c.id for c in parse_conditions("c,d")] == ["C", "D"]
     assert [c.id for c in parse_conditions(None)] == list(DEFAULT_CONDITIONS)
-    assert [c.id for c in parse_conditions("all")] == ["A", "B", "C", "D", "E"]
+    assert [c.id for c in parse_conditions("all")] == [
+        "A", "B", "C", "D", "E", "G", "H", "N", "S", "K", "O",
+    ]
 
 
 def test_an_unknown_condition_is_a_clear_error():
     with pytest.raises(ConditionError, match="unknown condition"):
         parse_conditions("C,Z")
     with pytest.raises(ConditionError, match="unknown condition"):
-        condition("H")
+        condition("Z")
 
 
 def test_the_matrix_table_lists_every_condition():

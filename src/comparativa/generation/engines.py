@@ -63,6 +63,11 @@ from ..voices import catalog
 from .sampling import (
     CHATTERBOX_SAMPLING,
     CHATTERBOX_TURBO_SAMPLING,
+    CSM_SAMPLING,
+    DIA_SAMPLING,
+    HIGGS_SAMPLING,
+    KOKORO_SAMPLING,
+    ORPHEUS_SAMPLING,
     QWEN3_ICL_SAMPLING,
     QWEN3_SAMPLING,
     SOPRANO_SAMPLING,
@@ -261,6 +266,92 @@ ENGINE_SPECS: Final[dict[str, EngineSpec]] = {
         notes=(
             "Optional speed probe. Splits itself on sentence boundaries "
             "(`split_pattern=r'(?<=[.!?])\\s+'`, chatterbox_turbo.py:791)."
+        ),
+    ),
+    "dia": EngineSpec(
+        key="dia",
+        family="dia",
+        checkpoint="mlx-community/Dia-1.6B-fp16",
+        sampling=DIA_SAMPLING,
+        preset_voices=False,
+        clone_voices=True,
+        clone_needs_ref_text=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=44100,
+        notes=(
+            "Nari Labs (South Korea), trained from scratch — no LLM backbone. "
+            "Dialogue-native: text is speaker-tagged; single-character lines "
+            "are sent as '[S1] <text>' with the reference as '[S1] <ref_text>'. "
+            "Clones from ref audio + transcript. 44.1 kHz output; the .vox "
+            "24 kHz reference is resampled by the clone cache."
+        ),
+    ),
+    "csm": EngineSpec(
+        key="csm",
+        family="sesame",
+        checkpoint="mlx-community/csm-1b-fp16",
+        sampling=CSM_SAMPLING,
+        preset_voices=False,
+        clone_voices=True,
+        clone_needs_ref_text=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=24000,
+        notes=(
+            "Sesame AI (US), Llama backbone. Conversational model; clones from "
+            "ref audio + transcript (sesame.py generate ref_audio/ref_text)."
+        ),
+    ),
+    "higgs": EngineSpec(
+        key="higgs",
+        family="higgs_audio",
+        checkpoint="mlx-community/higgs-audio-v2-3B-mlx-q8",
+        sampling=HIGGS_SAMPLING,
+        preset_voices=False,
+        clone_voices=True,
+        clone_needs_ref_text=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=24000,
+        notes=(
+            "Boson AI (US), Llama 3.2 backbone. Only quantized MLX conversions "
+            "exist (q8 used — a stated quality caveat vs the fp16 conditions). "
+            "Clones from 24 kHz ref audio + transcript; the codec loads from "
+            "mlx-community/higgs-audio-v2-tokenizer (higgs_audio/model.py:41)."
+        ),
+    ),
+    "kokoro": EngineSpec(
+        key="kokoro",
+        family="kokoro",
+        checkpoint="mlx-community/Kokoro-82M-bf16",
+        sampling=KOKORO_SAMPLING,
+        preset_voices=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=24000,
+        notes=(
+            "Indie (hexgrad, US), StyleTTS2 lineage, from scratch. Presets "
+            "control: ~28 English voices, no cloning, no sampling knobs "
+            "(deterministic). Hard 510-phoneme cap per call "
+            "(kokoro/pipeline.py:337) -- our 12 s chunker keeps well under it. "
+            "lang_code is derived from the voice prefix (af_->a, bf_->b)."
+        ),
+    ),
+    "orpheus": EngineSpec(
+        key="orpheus",
+        family="llama",
+        checkpoint="mlx-community/orpheus-3b-0.1-ft-bf16",
+        sampling=ORPHEUS_SAMPLING,
+        preset_voices=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=24000,
+        notes=(
+            "Canopy Labs (US), Llama backbone, 8 preset voices. 1200-token cap "
+            "is ~14 s of audio, so chunking is mandatory. Also supports "
+            "ref-audio cloning (unused this round; the -ft checkpoint is "
+            "preset-tuned)."
         ),
     ),
     "soprano": EngineSpec(
@@ -593,12 +684,24 @@ class Engine:
         return SEEDING_MLX_GLOBAL
 
     def _clone_ref_audio(self, clone: CloneVoice):
-        """The clone's waveform as an ``mx.array``, converted once per name."""
+        """The clone's waveform as an ``mx.array`` at the engine's sample rate.
+
+        Converted (and resampled, when the reference's rate differs — e.g. the
+        24 kHz ``.vox`` samples on 44.1 kHz Dia) once per clone name.
+        """
         cached = self._clone_audio_cache.get(clone.name)
         if cached is None:
             import mlx.core as mx
 
-            cached = mx.array(clone.audio)
+            audio = clone.audio
+            if clone.sample_rate != self.sample_rate:
+                from mlx_audio.utils import resample_audio
+
+                audio = np.asarray(
+                    resample_audio(audio, clone.sample_rate, self.sample_rate),
+                    dtype=np.float32,
+                )
+            cached = mx.array(audio)
             self._clone_audio_cache[clone.name] = cached
         return cached
 
@@ -638,11 +741,6 @@ class Engine:
 
         if family == "qwen3_tts":
             if clone is not None:
-                if clone.sample_rate != self.sample_rate:
-                    raise EngineError(
-                        f"clone {clone.name!r} reference is {clone.sample_rate} Hz "
-                        f"but {self.spec.key} expects {self.sample_rate} Hz"
-                    )
                 # Base-checkpoint ICL path: ref audio + transcript, no preset
                 # voice, no instruct (qwen3_tts.py routes on ref_audio+ref_text).
                 results = self.model.generate(
@@ -699,6 +797,52 @@ class Engine:
                 repetition_penalty=s.repetition_penalty,
                 min_p=s.extra.get("min_p", 0.0),
                 max_tokens=s.max_tokens,
+            )
+        elif family == "dia":
+            # Dialogue-native model: a single-character line is one [S1] turn,
+            # and the reference transcript is tagged the same way.
+            results = self.model.generate(
+                text=f"[S1] {text}",
+                ref_audio=self._clone_ref_audio(clone) if clone else None,
+                ref_text=f"[S1] {clone.ref_text}" if clone else None,
+                temperature=s.temperature,
+                top_p=s.top_p,
+                max_tokens=s.max_tokens or None,
+                verbose=False,
+            )
+        elif family == "sesame":
+            results = self.model.generate(
+                text=text,
+                ref_audio=self._clone_ref_audio(clone) if clone else None,
+                ref_text=clone.ref_text if clone else None,
+                max_audio_length_ms=s.extra.get("max_audio_length_ms", 90_000.0),
+                verbose=False,
+            )
+        elif family == "higgs_audio":
+            results = self.model.generate(
+                text=text,
+                ref_audio=self._clone_ref_audio(clone) if clone else None,
+                ref_text=clone.ref_text if clone else None,
+                temperature=s.temperature,
+                top_p=s.top_p,
+                max_new_frames=s.max_tokens,
+                verbose=False,
+            )
+        elif family == "kokoro":
+            # No sampling knobs; lang_code follows the voice prefix (af_->a).
+            results = self.model.generate(
+                text=text,
+                voice=voice,
+                lang_code=(voice or "a")[0],
+            )
+        elif family == "llama":
+            results = self.model.generate(
+                text=text,
+                voice=voice,
+                temperature=s.temperature,
+                top_p=s.top_p,
+                max_tokens=s.max_tokens,
+                verbose=False,
             )
         elif family == "soprano":
             results = self.model.generate(

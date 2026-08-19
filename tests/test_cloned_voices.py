@@ -114,7 +114,9 @@ def test_character_without_vox_falls_back_or_goes_unresolved(project):
     assert ghost["soprano"] == {"mode": "default", "voice": "default"}
 
     problems = unresolved_characters(doc)
-    assert problems == {"GHOST": ["qwen3-0.6b-clone", "qwen3-1.7b-clone"]}
+    assert problems == {
+        "GHOST": ["csm", "dia", "higgs", "qwen3-0.6b-clone", "qwen3-1.7b-clone"]
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -224,12 +226,15 @@ def make_clone(name: str = "vox:TESTY", *, ref_text: str | None = REF_TEXT) -> C
     )
 
 
-def test_clone_engine_keys_are_the_expected_four():
+def test_clone_engine_keys_cover_every_clone_capable_engine():
     assert set(CLONE_ENGINE_KEYS) == {
         "qwen3-1.7b-clone",
         "qwen3-0.6b-clone",
         "chatterbox",
         "chatterbox-turbo",
+        "dia",
+        "csm",
+        "higgs",
     }
 
 
@@ -296,13 +301,16 @@ def test_turbo_clone_restores_cached_conditionals_between_voices():
     assert model.calls[2]["conds_used"] == ("conds", 1)  # cache hit, not re-prepared
 
 
-def test_qwen3_clone_rejects_a_sample_rate_mismatch():
+def test_clone_reference_is_resampled_to_the_engine_rate():
+    """A 24 kHz .vox reference must reach 44.1 kHz Dia at 44.1 kHz."""
     engine = Engine(spec("qwen3-1.7b-clone"), FakeQwenBase())
     clone = CloneVoice(
-        name="vox:BAD", audio=_tone(6.0), sample_rate=44100, ref_text=REF_TEXT
+        name="vox:HI", audio=_tone(6.0, 48000), sample_rate=48000, ref_text=REF_TEXT
     )
-    with pytest.raises(EngineError, match="44100"):
-        engine.generate_line(LineRequest(text="Hello.", clone=clone))
+    resampled = engine._clone_ref_audio(clone)
+    assert len(resampled) == pytest.approx(6.0 * engine.sample_rate, rel=0.01)
+    # Cached per name: the second request returns the same converted array.
+    assert engine._clone_ref_audio(clone) is resampled
 
 
 # ---------------------------------------------------------------------------

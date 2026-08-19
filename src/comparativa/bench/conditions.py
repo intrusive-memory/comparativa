@@ -190,11 +190,64 @@ CONDITIONS: Final[dict[str, Condition]] = {
         engine="chatterbox",
         checkpoint=_checkpoint("chatterbox"),
         presets="presets-cloned.yaml",
-        optional=True,
         notes=(
-            "Round 2, optional: chatterbox conditioned on the same references "
-            "as B. Compares clone quality across model families (B vs G)."
+            "Round 2/3 challenger: chatterbox conditioned on the production "
+            ".vox references (Resemble AI, Canada)."
         ),
+    ),
+    "H": Condition(
+        id="H",
+        stack=STACK_PYTHON,
+        label="comparativa, Higgs Audio v2 3B (q8), .vox-cloned voices",
+        voices=".vox-cloned per character (presets-cloned.yaml, ref audio + transcript)",
+        engine="higgs",
+        checkpoint=_checkpoint("higgs"),
+        presets="presets-cloned.yaml",
+        notes=(
+            "Round 3 challenger (Boson AI, US; Llama backbone). Only quantized "
+            "MLX conversions exist — q8 is a stated quality caveat."
+        ),
+    ),
+    "N": Condition(
+        id="N",
+        stack=STACK_PYTHON,
+        label="comparativa, Dia-1.6B fp16, .vox-cloned voices",
+        voices=".vox-cloned per character (presets-cloned.yaml, ref audio + transcript)",
+        engine="dia",
+        checkpoint=_checkpoint("dia"),
+        presets="presets-cloned.yaml",
+        notes="Round 3 challenger (Nari Labs, South Korea; dialogue-native, from scratch).",
+    ),
+    "S": Condition(
+        id="S",
+        stack=STACK_PYTHON,
+        label="comparativa, Sesame CSM-1B fp16, .vox-cloned voices",
+        voices=".vox-cloned per character (presets-cloned.yaml, ref audio + transcript)",
+        engine="csm",
+        checkpoint=_checkpoint("csm"),
+        presets="presets-cloned.yaml",
+        notes="Round 3 challenger (Sesame AI, US; Llama backbone).",
+    ),
+    "K": Condition(
+        id="K",
+        stack=STACK_PYTHON,
+        label="comparativa, Kokoro-82M bf16, preset voices",
+        voices="built-in preset speakers, auto-assigned per character (presets.yaml)",
+        engine="kokoro",
+        checkpoint=_checkpoint("kokoro"),
+        notes=(
+            "Round 3 presets control (indie/hexgrad, US; StyleTTS2 lineage). "
+            "28 English presets; deterministic, no sampling knobs."
+        ),
+    ),
+    "O": Condition(
+        id="O",
+        stack=STACK_PYTHON,
+        label="comparativa, Orpheus 3B ft bf16, preset voices",
+        voices="built-in preset speakers, auto-assigned per character (presets.yaml)",
+        engine="orpheus",
+        checkpoint=_checkpoint("orpheus"),
+        notes="Round 3 presets probe (Canopy Labs, US; Llama backbone; 8 voices).",
     ),
     "T": Condition(
         id="T",
@@ -211,9 +264,10 @@ CONDITIONS: Final[dict[str, Condition]] = {
 #: Condition ids in matrix order.
 CONDITION_IDS: Final[tuple[str, ...]] = tuple(CONDITIONS)
 
-#: What ``bench`` runs when ``--conditions`` is not given. B joined in round 2;
-#: it needs a generated ``presets-cloned.yaml`` and fails loudly without one.
-DEFAULT_CONDITIONS: Final[tuple[str, ...]] = ("B", "C", "D", "E")
+#: What ``bench`` runs when ``--conditions`` is not given: the round-3 active
+#: roster — the .vox-cloned challengers plus the two presets controls. The
+#: retired round-1/2 conditions (B/C/D/E) stay runnable by explicit id.
+DEFAULT_CONDITIONS: Final[tuple[str, ...]] = ("G", "H", "N", "S", "K", "O")
 
 
 def condition(name: str) -> Condition:

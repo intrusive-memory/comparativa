@@ -66,7 +66,10 @@ def _load(key: str):
 
 
 @requires_corpus
-@pytest.mark.parametrize("key", ("qwen3-1.7b-clone", "chatterbox", "chatterbox-turbo"))
+@pytest.mark.parametrize(
+    "key",
+    ("qwen3-1.7b-clone", "chatterbox", "chatterbox-turbo", "dia", "csm", "higgs"),
+)
 def test_engine_clones_one_line(key, offline_env, archer_clone):
     engine = _load(key)
     result = engine.generate_line(

@@ -42,6 +42,11 @@ CONDITION_LABELS: dict[str, str] = {
     "E": "Python · Soprano-80M · single voice",
     "F": "Swift · mlx-audio-swift Soprano",
     "G": "Python · chatterbox · .vox-cloned",
+    "H": "Python · Higgs Audio v2 3B (q8) · .vox-cloned",
+    "K": "Python · Kokoro-82M · en-US presets",
+    "N": "Python · Dia-1.6B · .vox-cloned",
+    "O": "Python · Orpheus 3B · en-US presets",
+    "S": "Python · Sesame CSM-1B · .vox-cloned",
     "T": "Python · chatterbox-turbo · default voice",
 }
 

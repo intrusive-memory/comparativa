@@ -31,16 +31,23 @@ config), `src/comparativa/bench/metrics.py` (the schema),
 | D | python | `chatterbox` → `mlx-community/chatterbox-fp16` | engine default | `bench` |
 | E | python | `soprano` → `mlx-community/Soprano-80M-bf16` | single built-in | `bench` |
 | F | swift | `mlx-community/Soprano-80M-bf16` (RD-1, same as E) | single built-in | external — Sortie 8 |
-| G | python | `chatterbox` → `mlx-community/chatterbox-fp16` | `.vox`-cloned per character (`presets-cloned.yaml`) | `bench`, optional (round 2) |
+| G | python | `chatterbox` → `mlx-community/chatterbox-fp16` | `.vox`-cloned per character (`presets-cloned.yaml`) | `bench` (round 2/3 challenger) |
+| H | python | `higgs` → `mlx-community/higgs-audio-v2-3B-mlx-q8` | `.vox`-cloned per character | `bench` (round 3) |
+| N | python | `dia` → `mlx-community/Dia-1.6B-fp16` | `.vox`-cloned per character | `bench` (round 3) |
+| S | python | `csm` → `mlx-community/csm-1b-fp16` | `.vox`-cloned per character | `bench` (round 3) |
+| K | python | `kokoro` → `mlx-community/Kokoro-82M-bf16` | en-US presets per character (`presets.yaml`) | `bench` (round 3 control) |
+| O | python | `orpheus` → `mlx-community/orpheus-3b-0.1-ft-bf16` | en-US presets per character (`presets.yaml`) | `bench` (round 3) |
 | T | python | `chatterbox-turbo` → `mlx-community/chatterbox-turbo-fp16` | engine default | `bench`, optional speed probe |
 
-`--conditions` defaults to `B,C,D,E`; `all` selects `A,B,C,D,E` (the
-non-optional set). Condition **B** un-defers RD-2 in round 2: the Python Base
-checkpoint ICL-clones every character from the same `.vox` bundles condition A
-uses, so **A vs B** is the Swift-vs-Python comparison with the voice-design
-confound removed. B and G carry `presets-cloned.yaml` to the child `generate`
-via `Condition.presets` and fail loudly if it has not been generated
-(`comparativa voices <project> --mode cloned --write`). See
+`--conditions` defaults to `G,H,N,S,K,O` — the round-3 active roster after the
+2026-08-19 user rulings (multiple voices required, so single-voice Soprano is
+out; Chinese-vendor/backbone engines are out, which retires the Python Qwen
+conditions B/C; A stays as the Produciesta reference). The retired conditions
+remain runnable by explicit id, and `all` selects every non-optional id.
+Clone conditions carry `presets-cloned.yaml` to the child `generate` via
+`Condition.presets` and fail loudly if it has not been generated
+(`comparativa voices <project> --mode cloned --write`). All preset assignments
+are en-US only (non-US presets are marked unassignable in the catalog). See
 `docs/VOICE_CLONING.md`.
 
 A and F are declared here but refused by the runner — they exist so both sorties

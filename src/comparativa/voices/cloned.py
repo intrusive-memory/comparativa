@@ -50,6 +50,9 @@ CLONE_REF_MODEL_SIZE: Final[dict[str, str]] = {
     "qwen3-0.6b-clone": "0.6b",
     "chatterbox": "1.7b",
     "chatterbox-turbo": "1.7b",
+    "dia": "1.7b",
+    "csm": "1.7b",
+    "higgs": "1.7b",
 }
 
 #: Engines covered by a cloned document, in matrix order.
@@ -58,11 +61,16 @@ CLONED_ENGINE_KEYS: Final[tuple[str, ...]] = (
     "qwen3-0.6b-clone",
     "chatterbox",
     "chatterbox-turbo",
+    "dia",
+    "csm",
+    "higgs",
     "soprano",
 )
 
 #: Engines whose clone path needs the reference transcript.
-_NEEDS_REF_TEXT: Final = frozenset({"qwen3-1.7b-clone", "qwen3-0.6b-clone"})
+_NEEDS_REF_TEXT: Final = frozenset(
+    {"qwen3-1.7b-clone", "qwen3-0.6b-clone", "dia", "csm", "higgs"}
+)
 
 
 class ClonedVoicesError(RuntimeError):

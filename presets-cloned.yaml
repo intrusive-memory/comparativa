@@ -27,6 +27,18 @@ engines:
     checkpoint: mlx-community/chatterbox-turbo-fp16
     clone_voices: true
     clone_source: .vox embeddings/qwen3-tts/1.7b (sample-audio.wav)
+  dia:
+    checkpoint: mlx-community/Dia-1.6B-fp16
+    clone_voices: true
+    clone_source: .vox embeddings/qwen3-tts/1.7b (sample-audio.wav + clone-prompt.bin refText)
+  csm:
+    checkpoint: mlx-community/csm-1b-fp16
+    clone_voices: true
+    clone_source: .vox embeddings/qwen3-tts/1.7b (sample-audio.wav + clone-prompt.bin refText)
+  higgs:
+    checkpoint: mlx-community/higgs-audio-v2-3B-mlx-q8
+    clone_voices: true
+    clone_source: .vox embeddings/qwen3-tts/1.7b (sample-audio.wav + clone-prompt.bin refText)
   soprano:
     checkpoint: mlx-community/Soprano-80M-bf16
     clone_voices: false
@@ -68,6 +80,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/ARCHER.vox
+        vox_sha256: 1c83e72543a00f68cfabc7bf12610b56400178245d95cf2ae30aea2bc50a33d0
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.24
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/ARCHER.vox
+        vox_sha256: 1c83e72543a00f68cfabc7bf12610b56400178245d95cf2ae30aea2bc50a33d0
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.24
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/ARCHER.vox
+        vox_sha256: 1c83e72543a00f68cfabc7bf12610b56400178245d95cf2ae30aea2bc50a33d0
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.24
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/ARCHER.vox
         vox_sha256: 1c83e72543a00f68cfabc7bf12610b56400178245d95cf2ae30aea2bc50a33d0
@@ -128,6 +173,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/BECKETT.vox
+        vox_sha256: d8bcdf14b133552fb865ca1aa97f8f66e52b641ed8ba15bbc956a70a4ab753be
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.88
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/BECKETT.vox
+        vox_sha256: d8bcdf14b133552fb865ca1aa97f8f66e52b641ed8ba15bbc956a70a4ab753be
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.88
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/BECKETT.vox
+        vox_sha256: d8bcdf14b133552fb865ca1aa97f8f66e52b641ed8ba15bbc956a70a4ab753be
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.88
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -168,6 +246,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/CLARK.vox
+        vox_sha256: 4a511879a0a4a9c5bd7d99a1fdeebae2ed2ac52bd2e013321835fdd5cff5ad43
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/CLARK.vox
+        vox_sha256: 4a511879a0a4a9c5bd7d99a1fdeebae2ed2ac52bd2e013321835fdd5cff5ad43
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/CLARK.vox
+        vox_sha256: 4a511879a0a4a9c5bd7d99a1fdeebae2ed2ac52bd2e013321835fdd5cff5ad43
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/CLARK.vox
         vox_sha256: 4a511879a0a4a9c5bd7d99a1fdeebae2ed2ac52bd2e013321835fdd5cff5ad43
@@ -228,6 +339,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/CYRUS.vox
+        vox_sha256: 572d55817e07d0409e871a345b6ae20b6b446848a5b7e7da202226f3376066ba
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.4
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/CYRUS.vox
+        vox_sha256: 572d55817e07d0409e871a345b6ae20b6b446848a5b7e7da202226f3376066ba
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.4
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/CYRUS.vox
+        vox_sha256: 572d55817e07d0409e871a345b6ae20b6b446848a5b7e7da202226f3376066ba
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.4
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -268,6 +412,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/DONNA.vox
+        vox_sha256: 66658e5068ecec7ec76b88d6480e34f5e5f432f366f38f06a43398b40c6625ed
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/DONNA.vox
+        vox_sha256: 66658e5068ecec7ec76b88d6480e34f5e5f432f366f38f06a43398b40c6625ed
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/DONNA.vox
+        vox_sha256: 66658e5068ecec7ec76b88d6480e34f5e5f432f366f38f06a43398b40c6625ed
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/DONNA.vox
         vox_sha256: 66658e5068ecec7ec76b88d6480e34f5e5f432f366f38f06a43398b40c6625ed
@@ -328,6 +505,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/DUKE.vox
+        vox_sha256: ff2f41aac164d21511010ded5295fd1f37983c99244f88586cb53df7320b69ca
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.24
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/DUKE.vox
+        vox_sha256: ff2f41aac164d21511010ded5295fd1f37983c99244f88586cb53df7320b69ca
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.24
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/DUKE.vox
+        vox_sha256: ff2f41aac164d21511010ded5295fd1f37983c99244f88586cb53df7320b69ca
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.24
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -368,6 +578,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/GARETH.vox
+        vox_sha256: 88f09396f502b88fa1e9af1c1d965d717b565a28aba3473aeffb189ee968029d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.76
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/GARETH.vox
+        vox_sha256: 88f09396f502b88fa1e9af1c1d965d717b565a28aba3473aeffb189ee968029d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.76
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/GARETH.vox
+        vox_sha256: 88f09396f502b88fa1e9af1c1d965d717b565a28aba3473aeffb189ee968029d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.76
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/GARETH.vox
         vox_sha256: 88f09396f502b88fa1e9af1c1d965d717b565a28aba3473aeffb189ee968029d
@@ -428,6 +671,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/HUNTER.vox
+        vox_sha256: eded735e284a5553ab94222ec42204f5fdedbeeaead1fcba447186a00edaacd3
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.92
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/HUNTER.vox
+        vox_sha256: eded735e284a5553ab94222ec42204f5fdedbeeaead1fcba447186a00edaacd3
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.92
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/HUNTER.vox
+        vox_sha256: eded735e284a5553ab94222ec42204f5fdedbeeaead1fcba447186a00edaacd3
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.92
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -468,6 +744,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/IOLA.vox
+        vox_sha256: 8d35e8343da321db9b89b5a26d05b27405a1e8c25a7ee9cdd1f321de0949d060
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.8
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/IOLA.vox
+        vox_sha256: 8d35e8343da321db9b89b5a26d05b27405a1e8c25a7ee9cdd1f321de0949d060
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.8
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/IOLA.vox
+        vox_sha256: 8d35e8343da321db9b89b5a26d05b27405a1e8c25a7ee9cdd1f321de0949d060
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.8
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/IOLA.vox
         vox_sha256: 8d35e8343da321db9b89b5a26d05b27405a1e8c25a7ee9cdd1f321de0949d060
@@ -528,6 +837,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/JOANN.vox
+        vox_sha256: 1333ea3d2c8842650355dd67581527dcdf5c709c8aee5085a62b0ebf46dd3aac
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.6
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/JOANN.vox
+        vox_sha256: 1333ea3d2c8842650355dd67581527dcdf5c709c8aee5085a62b0ebf46dd3aac
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.6
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/JOANN.vox
+        vox_sha256: 1333ea3d2c8842650355dd67581527dcdf5c709c8aee5085a62b0ebf46dd3aac
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.6
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -568,6 +910,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/KEVIN.vox
+        vox_sha256: 99593e3f923bce4d8ce547e68183fc521fa4bc0748f56576ae0b36aadaf5eaf8
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 4.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/KEVIN.vox
+        vox_sha256: 99593e3f923bce4d8ce547e68183fc521fa4bc0748f56576ae0b36aadaf5eaf8
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 4.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/KEVIN.vox
+        vox_sha256: 99593e3f923bce4d8ce547e68183fc521fa4bc0748f56576ae0b36aadaf5eaf8
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 4.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/KEVIN.vox
         vox_sha256: 99593e3f923bce4d8ce547e68183fc521fa4bc0748f56576ae0b36aadaf5eaf8
@@ -631,6 +1006,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/KIERAN.vox
+        vox_sha256: fde33de7f6bb999252aa537171987169270b45f754fa2ab12b5f489ee440dccb
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/KIERAN.vox
+        vox_sha256: fde33de7f6bb999252aa537171987169270b45f754fa2ab12b5f489ee440dccb
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/KIERAN.vox
+        vox_sha256: fde33de7f6bb999252aa537171987169270b45f754fa2ab12b5f489ee440dccb
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -671,6 +1079,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/LEROY.vox
+        vox_sha256: e583e7208aee71df88e4916a7db4209df31fe1bd8492836dbe2a2fb2d6ae7729
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.16
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/LEROY.vox
+        vox_sha256: e583e7208aee71df88e4916a7db4209df31fe1bd8492836dbe2a2fb2d6ae7729
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.16
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/LEROY.vox
+        vox_sha256: e583e7208aee71df88e4916a7db4209df31fe1bd8492836dbe2a2fb2d6ae7729
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.16
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/LEROY.vox
         vox_sha256: e583e7208aee71df88e4916a7db4209df31fe1bd8492836dbe2a2fb2d6ae7729
@@ -731,6 +1172,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/LINC.vox
+        vox_sha256: d99a9df2ba6f1d19c0fbda5ff42d355549b85577aba83278edecc21a08de9cd1
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.4
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/LINC.vox
+        vox_sha256: d99a9df2ba6f1d19c0fbda5ff42d355549b85577aba83278edecc21a08de9cd1
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.4
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/LINC.vox
+        vox_sha256: d99a9df2ba6f1d19c0fbda5ff42d355549b85577aba83278edecc21a08de9cd1
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.4
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -781,6 +1255,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/MARSHALL.vox
+        vox_sha256: a2513acdaf6beceb90e52312d90842b21e73767a5016591494d71034dfd9358d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.2
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/MARSHALL.vox
+        vox_sha256: a2513acdaf6beceb90e52312d90842b21e73767a5016591494d71034dfd9358d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.2
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/MARSHALL.vox
+        vox_sha256: a2513acdaf6beceb90e52312d90842b21e73767a5016591494d71034dfd9358d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.2
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -819,6 +1326,36 @@ assignments:
         ref_text: The opposite of talking isn't listening. The opposite of talking is waiting.
         language: en
       chatterbox-turbo:
+        mode: clone
+        vox: voices/NARRATOR.vox
+        vox_sha256: 9584f1233f8c6ba6201d100406cba3dba69ba4ab8d0218632e090b0cdb6b84ba
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 5.52
+        ref_sample_rate: 24000
+        ref_text: The opposite of talking isn't listening. The opposite of talking is waiting.
+        language: en
+      dia:
+        mode: clone
+        vox: voices/NARRATOR.vox
+        vox_sha256: 9584f1233f8c6ba6201d100406cba3dba69ba4ab8d0218632e090b0cdb6b84ba
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 5.52
+        ref_sample_rate: 24000
+        ref_text: The opposite of talking isn't listening. The opposite of talking is waiting.
+        language: en
+      csm:
+        mode: clone
+        vox: voices/NARRATOR.vox
+        vox_sha256: 9584f1233f8c6ba6201d100406cba3dba69ba4ab8d0218632e090b0cdb6b84ba
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 5.52
+        ref_sample_rate: 24000
+        ref_text: The opposite of talking isn't listening. The opposite of talking is waiting.
+        language: en
+      higgs:
         mode: clone
         vox: voices/NARRATOR.vox
         vox_sha256: 9584f1233f8c6ba6201d100406cba3dba69ba4ab8d0218632e090b0cdb6b84ba
@@ -880,6 +1417,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/PREDATOR_MOM_1.vox
+        vox_sha256: b25418fc840484427a0eed9f0dcc8fcc6a534b3a88d0104fd2f6b3b98fd0916d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.6
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/PREDATOR_MOM_1.vox
+        vox_sha256: b25418fc840484427a0eed9f0dcc8fcc6a534b3a88d0104fd2f6b3b98fd0916d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.6
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/PREDATOR_MOM_1.vox
+        vox_sha256: b25418fc840484427a0eed9f0dcc8fcc6a534b3a88d0104fd2f6b3b98fd0916d
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.6
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -920,6 +1490,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/PREDATOR_MOM_2.vox
+        vox_sha256: 8d8dae9d3e4286731f93b1299d8478befd3182e24ff8d52e16abecaea58c2f14
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.88
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/PREDATOR_MOM_2.vox
+        vox_sha256: 8d8dae9d3e4286731f93b1299d8478befd3182e24ff8d52e16abecaea58c2f14
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.88
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/PREDATOR_MOM_2.vox
+        vox_sha256: 8d8dae9d3e4286731f93b1299d8478befd3182e24ff8d52e16abecaea58c2f14
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 8.88
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/PREDATOR_MOM_2.vox
         vox_sha256: 8d8dae9d3e4286731f93b1299d8478befd3182e24ff8d52e16abecaea58c2f14
@@ -980,6 +1583,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/PREDATOR_MOM_3.vox
+        vox_sha256: 4254ad7027539330d90af469d8defe232924ded55b6a4b08c4504c51974715f7
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.04
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/PREDATOR_MOM_3.vox
+        vox_sha256: 4254ad7027539330d90af469d8defe232924ded55b6a4b08c4504c51974715f7
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.04
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/PREDATOR_MOM_3.vox
+        vox_sha256: 4254ad7027539330d90af469d8defe232924ded55b6a4b08c4504c51974715f7
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.04
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -1020,6 +1656,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/PRINCIPAL.vox
+        vox_sha256: f05c246d2ad38d2831716822165faf13a4f5c4a0c5929f2178c9a36ed709769e
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/PRINCIPAL.vox
+        vox_sha256: f05c246d2ad38d2831716822165faf13a4f5c4a0c5929f2178c9a36ed709769e
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/PRINCIPAL.vox
+        vox_sha256: f05c246d2ad38d2831716822165faf13a4f5c4a0c5929f2178c9a36ed709769e
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.96
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/PRINCIPAL.vox
         vox_sha256: f05c246d2ad38d2831716822165faf13a4f5c4a0c5929f2178c9a36ed709769e
@@ -1080,6 +1749,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/RAY.vox
+        vox_sha256: 4aa12901cae5ac04ee14e14a232ab19b59781f34da24b0d33d090f6e5fe752d2
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/RAY.vox
+        vox_sha256: 4aa12901cae5ac04ee14e14a232ab19b59781f34da24b0d33d090f6e5fe752d2
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/RAY.vox
+        vox_sha256: 4aa12901cae5ac04ee14e14a232ab19b59781f34da24b0d33d090f6e5fe752d2
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.56
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -1120,6 +1822,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/SHANE.vox
+        vox_sha256: a8740d0e1cca759910e6ad46f7023a30c6525f30e7b53cba7e3eea92fbb11568
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 9.12
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/SHANE.vox
+        vox_sha256: a8740d0e1cca759910e6ad46f7023a30c6525f30e7b53cba7e3eea92fbb11568
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 9.12
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/SHANE.vox
+        vox_sha256: a8740d0e1cca759910e6ad46f7023a30c6525f30e7b53cba7e3eea92fbb11568
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 9.12
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/SHANE.vox
         vox_sha256: a8740d0e1cca759910e6ad46f7023a30c6525f30e7b53cba7e3eea92fbb11568
@@ -1180,6 +1915,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/SPENCER.vox
+        vox_sha256: 9fd3d4045c210d61292b24a6006d6f0669d5e504f204f7e4b7710fe04eb5c326
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.2
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/SPENCER.vox
+        vox_sha256: 9fd3d4045c210d61292b24a6006d6f0669d5e504f204f7e4b7710fe04eb5c326
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.2
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/SPENCER.vox
+        vox_sha256: 9fd3d4045c210d61292b24a6006d6f0669d5e504f204f7e4b7710fe04eb5c326
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 7.2
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -1230,6 +1998,39 @@ assignments:
         ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
           wooden docks.
         language: english
+      dia:
+        mode: clone
+        vox: voices/TOBY.vox
+        vox_sha256: 4904ff80174ea0b824b1a5d07674d5cd2a33d5c273b3b5b3822c01fbe5e4ac55
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 5.44
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/TOBY.vox
+        vox_sha256: 4904ff80174ea0b824b1a5d07674d5cd2a33d5c273b3b5b3822c01fbe5e4ac55
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 5.44
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
+        mode: clone
+        vox: voices/TOBY.vox
+        vox_sha256: 4904ff80174ea0b824b1a5d07674d5cd2a33d5c273b3b5b3822c01fbe5e4ac55
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 5.44
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
       soprano:
         mode: default
         voice: default
@@ -1270,6 +2071,39 @@ assignments:
           wooden docks.
         language: english
       chatterbox-turbo:
+        mode: clone
+        vox: voices/TUCKER.vox
+        vox_sha256: 440be1f47c2ff6a1ccdfc6ceac46c1ae944c85c2c6e1c46a4eb4edaf5c62b988
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.16
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      dia:
+        mode: clone
+        vox: voices/TUCKER.vox
+        vox_sha256: 440be1f47c2ff6a1ccdfc6ceac46c1ae944c85c2c6e1c46a4eb4edaf5c62b988
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.16
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      csm:
+        mode: clone
+        vox: voices/TUCKER.vox
+        vox_sha256: 440be1f47c2ff6a1ccdfc6ceac46c1ae944c85c2c6e1c46a4eb4edaf5c62b988
+        model_size: 1.7b
+        member: embeddings/qwen3-tts/1.7b/sample-audio.wav
+        ref_seconds: 6.16
+        ref_sample_rate: 24000
+        ref_text: The quiet harbor filled with golden light as fishing boats drifted back toward the weathered
+          wooden docks.
+        language: english
+      higgs:
         mode: clone
         vox: voices/TUCKER.vox
         vox_sha256: 440be1f47c2ff6a1ccdfc6ceac46c1ae944c85c2c6e1c46a4eb4edaf5c62b988

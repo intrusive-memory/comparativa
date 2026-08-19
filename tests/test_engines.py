@@ -163,7 +163,7 @@ def test_specs_cover_the_catalog_engines():
     for key in catalog.ENGINE_KEYS:
         assert ENGINE_SPECS[key].checkpoint == catalog.engine(key).checkpoint
     extras = set(ENGINE_KEYS) - set(catalog.ENGINE_KEYS)
-    assert extras == {"qwen3-1.7b-clone", "qwen3-0.6b-clone"}
+    assert extras == {"qwen3-1.7b-clone", "qwen3-0.6b-clone", "dia", "csm", "higgs"}
     for key in extras:
         assert ENGINE_SPECS[key].clone_voices
         assert ENGINE_SPECS[key].voices == ()  # tolerant, not a KeyError
