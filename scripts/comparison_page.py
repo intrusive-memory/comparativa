@@ -45,13 +45,18 @@ CONDITION_LABELS: dict[str, str] = {
     "T": "Python · chatterbox-turbo · default voice",
 }
 
-#: Default/single-voice renders whose player is redundant once the same
-#: engine's **cloned** render exists (the stats table still lists them).
-#: E (Soprano) has no entry: Soprano cannot clone — its one voice is baked in
-#: (soprano.py:387 discards the `voice` argument) — so E is Soprano's only
-#: render and always keeps its player.
-SUPERSEDED_BY_CLONE: dict[str, str] = {
-    "D": "G",  # chatterbox default -> chatterbox .vox-cloned
+#: Conditions whose *player* is hidden (the stats table still lists every
+#: generated cell). User rulings, 2026-08-19: engines need multiple voices —
+#: Soprano's single baked-in voice disqualifies it (soprano.py:387 discards
+#: the `voice` argument) — and the Python Qwen conditions are out of
+#: consideration; condition A stays as the Produciesta reference ("we'll just
+#: know it's Qwen").
+PLAYER_EXCLUSIONS: dict[str, str] = {
+    "B": "qwen removed from consideration",
+    "C": "qwen removed from consideration",
+    "D": "superseded by G (same engine, cloned voices)",
+    "E": "single-voice engine — disqualified",
+    "T": "single default voice — superseded by cloning",
 }
 
 _WS = re.compile(r"\s+")
@@ -306,12 +311,8 @@ def render(episodes, transcripts, skipped) -> str:
 
     for episode in sorted(episodes):
         all_rows = episodes[episode]
-        # A default-voice render's player is dropped when its cloned sibling
-        # was generated for this episode (the perf table above keeps it).
         rows = {
-            cond: row
-            for cond, row in all_rows.items()
-            if SUPERSEDED_BY_CLONE.get(cond) not in all_rows
+            cond: row for cond, row in all_rows.items() if cond not in PLAYER_EXCLUSIONS
         }
         transcript = transcripts.get(episode) or []
         offsets = {cond: row.offsets for cond, row in rows.items() if row.offsets}
@@ -360,10 +361,7 @@ def main() -> int:
         return 1
     OUT.write_text(render(episodes, transcripts, skipped), encoding="utf-8")
     players = sum(
-        1
-        for rows in episodes.values()
-        for cond in rows
-        if SUPERSEDED_BY_CLONE.get(cond) not in rows
+        1 for rows in episodes.values() for cond in rows if cond not in PLAYER_EXCLUSIONS
     )
     print(f"wrote {OUT} ({len(episodes)} episode(s), {players} players)")
     return 0
