@@ -83,28 +83,46 @@ def test_the_swift_conditions_are_declared_but_not_runnable_here():
         cond = CONDITIONS[cid]
         assert cond.stack == "swift"
         assert not cond.runnable  # Sortie 8 owns these
-    assert "B" not in CONDITIONS  # deferred to the custom-voices mission (RD-2)
+
+
+def test_condition_b_is_the_vox_cloned_qwen3_pair_for_a():
+    """Round 2: B un-defers the RD-2 cloned condition against A's voices."""
+    cond = CONDITIONS["B"]
+    assert cond.stack == "python"
+    assert cond.runnable
+    assert cond.engine == "qwen3-1.7b-clone"
+    assert cond.checkpoint == "mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16"
+    assert cond.presets == "presets-cloned.yaml"
+    assert "B" in DEFAULT_CONDITIONS
+
+
+def test_condition_g_is_the_optional_chatterbox_clone_probe():
+    cond = CONDITIONS["G"]
+    assert cond.engine == "chatterbox"
+    assert cond.optional
+    assert cond.presets == "presets-cloned.yaml"
+    assert "G" not in DEFAULT_CONDITIONS
 
 
 def test_the_turbo_speed_probe_is_optional_and_off_by_default():
     assert CONDITIONS["T"].engine == "chatterbox-turbo"
     assert CONDITIONS["T"].optional
     assert "T" not in DEFAULT_CONDITIONS
-    assert DEFAULT_CONDITIONS == ("C", "D", "E")
+    assert DEFAULT_CONDITIONS == ("B", "C", "D", "E")
 
 
 def test_conditions_parse_in_matrix_order_and_deduplicate():
     assert [c.id for c in parse_conditions("E,C,E")] == ["C", "E"]
     assert [c.id for c in parse_conditions("c,d")] == ["C", "D"]
     assert [c.id for c in parse_conditions(None)] == list(DEFAULT_CONDITIONS)
-    assert [c.id for c in parse_conditions("all")] == ["A", "C", "D", "E"]
+    assert [c.id for c in parse_conditions("all")] == ["A", "B", "C", "D", "E"]
 
 
 def test_an_unknown_condition_is_a_clear_error():
     with pytest.raises(ConditionError, match="unknown condition"):
         parse_conditions("C,Z")
     with pytest.raises(ConditionError, match="unknown condition"):
-        condition("B")
+        condition("H")
 
 
 def test_the_matrix_table_lists_every_condition():

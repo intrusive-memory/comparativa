@@ -26,15 +26,22 @@ config), `src/comparativa/bench/metrics.py` (the schema),
 | id | stack | engine / checkpoint | voices | runner |
 |---|---|---|---|---|
 | A | swift | Qwen3 1.7B bf16 (Produciesta records the exact repo) | `.vox` production voices | external — Sortie 8 |
+| B | python | `qwen3-1.7b-clone` → `mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16` | `.vox`-cloned per character (`presets-cloned.yaml`, ICL) | `bench` (round 2) |
 | C | python | `qwen3-1.7b` → `mlx-community/Qwen3-TTS-12Hz-1.7B-CustomVoice-bf16` | built-in presets per character (`presets.yaml`) | `bench` |
 | D | python | `chatterbox` → `mlx-community/chatterbox-fp16` | engine default | `bench` |
 | E | python | `soprano` → `mlx-community/Soprano-80M-bf16` | single built-in | `bench` |
 | F | swift | `mlx-community/Soprano-80M-bf16` (RD-1, same as E) | single built-in | external — Sortie 8 |
+| G | python | `chatterbox` → `mlx-community/chatterbox-fp16` | `.vox`-cloned per character (`presets-cloned.yaml`) | `bench`, optional (round 2) |
 | T | python | `chatterbox-turbo` → `mlx-community/chatterbox-turbo-fp16` | engine default | `bench`, optional speed probe |
 
-`--conditions` defaults to `C,D,E`; `all` selects `A,C,D,E` (the non-optional
-set). Condition **B** (qwen3 cloned from `.vox`) is deferred to the follow-on
-custom-voices mission (RD-2) and deliberately has no entry.
+`--conditions` defaults to `B,C,D,E`; `all` selects `A,B,C,D,E` (the
+non-optional set). Condition **B** un-defers RD-2 in round 2: the Python Base
+checkpoint ICL-clones every character from the same `.vox` bundles condition A
+uses, so **A vs B** is the Swift-vs-Python comparison with the voice-design
+confound removed. B and G carry `presets-cloned.yaml` to the child `generate`
+via `Condition.presets` and fail loudly if it has not been generated
+(`comparativa voices <project> --mode cloned --write`). See
+`docs/VOICE_CLONING.md`.
 
 A and F are declared here but refused by the runner — they exist so both sorties
 use the same condition ids, labels, and `metrics.json` fields. Asking for only
@@ -112,7 +119,7 @@ calls on every entry it writes).
 
 | field | ✔ | meaning |
 |---|---|---|
-| `condition` | ✔ | `A` / `C` / `D` / `E` / `F` / `T` |
+| `condition` | ✔ | `A` / `B` / `C` / `D` / `E` / `F` / `G` / `T` |
 | `stack` | ✔ | `python` or `swift` |
 | `label` | | human-readable condition description |
 | `engine` | ✔* | engine key, or the Swift tool's name (`produciesta`) |

@@ -27,6 +27,7 @@ from .assembly import (
 from .encode import EncodeError, M4A_BITRATE
 from .engines import ENGINE_KEYS, EngineError
 from .episode import (
+    DEFAULT_CLONED_PRESETS_PATH,
     DEFAULT_PRESETS_PATH,
     DEFAULT_SEED,
     EpisodePlan,
@@ -69,7 +70,12 @@ def configure(parser: argparse.ArgumentParser) -> None:
         "--presets",
         metavar="PATH",
         default=str(DEFAULT_PRESETS_PATH),
-        help=f"presets.yaml with the per-engine voice assignments (default: {DEFAULT_PRESETS_PATH}).",
+        help=(
+            f"presets file with the per-engine voice assignments (default: "
+            f"{DEFAULT_PRESETS_PATH}; the qwen3 *-clone engines default to "
+            f"{DEFAULT_CLONED_PRESETS_PATH} instead). Pass a schema-2 "
+            "presets-cloned.yaml to clone .vox voices on chatterbox too."
+        ),
     )
     voices.add_argument(
         "--cast",
@@ -186,10 +192,20 @@ def assembly_options(args: argparse.Namespace) -> AssemblyOptions:
 
 def plan_from_args(args: argparse.Namespace) -> EpisodePlan:
     """Build the episode plan described by the CLI arguments."""
+    from .engines import spec as engine_spec
+
+    presets = args.presets
+    # The ICL clone engines cannot run off the round-1 defaults file; when the
+    # user left --presets untouched, route them to the cloned assignments.
+    if presets == str(DEFAULT_PRESETS_PATH):
+        s = engine_spec(args.engine)
+        if s.clone_voices and s.clone_needs_ref_text:
+            presets = str(DEFAULT_CLONED_PRESETS_PATH)
+
     return build_plan(
         args.episode,
         args.engine,
-        presets_path=args.presets,
+        presets_path=presets,
         cast_path=args.cast,
         use_cast=not args.no_cast,
         speech_policy=args.speech_policy,

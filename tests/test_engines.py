@@ -157,9 +157,16 @@ def test_sampling_params_round_trip():
 
 
 def test_specs_cover_the_catalog_engines():
-    assert set(ENGINE_KEYS) == set(catalog.ENGINE_KEYS)
-    for key in ENGINE_KEYS:
+    # Round 2: the spec table is a superset of the round-1 catalog — the clone
+    # engines have no catalog entry because their voices come from .vox files.
+    assert set(catalog.ENGINE_KEYS) <= set(ENGINE_KEYS)
+    for key in catalog.ENGINE_KEYS:
         assert ENGINE_SPECS[key].checkpoint == catalog.engine(key).checkpoint
+    extras = set(ENGINE_KEYS) - set(catalog.ENGINE_KEYS)
+    assert extras == {"qwen3-1.7b-clone", "qwen3-0.6b-clone"}
+    for key in extras:
+        assert ENGINE_SPECS[key].clone_voices
+        assert ENGINE_SPECS[key].voices == ()  # tolerant, not a KeyError
 
 
 def test_smoke_engines_are_the_four_required_by_the_plan():
@@ -170,7 +177,7 @@ def test_soprano_uses_the_rd1_checkpoint():
     assert spec("soprano").checkpoint == "mlx-community/Soprano-80M-bf16"
 
 
-@pytest.mark.parametrize("key", ENGINE_KEYS)
+@pytest.mark.parametrize("key", catalog.ENGINE_KEYS)
 def test_capability_flags_agree_with_the_voice_catalog(key):
     s = spec(key)
     caps = s.capabilities()
@@ -178,6 +185,24 @@ def test_capability_flags_agree_with_the_voice_catalog(key):
     assert caps["voice_count"] == len(catalog.engine(key).voices)
     assert caps["seeding"] is True
     assert caps["seeding_note"]
+
+
+@pytest.mark.parametrize("key", ("qwen3-1.7b-clone", "qwen3-0.6b-clone"))
+def test_clone_engine_capabilities(key):
+    caps = spec(key).capabilities()
+    assert caps["clone_voices"] is True
+    assert caps["clone_needs_ref_text"] is True
+    assert caps["preset_voices"] is False
+    assert caps["voice_count"] == 0
+    assert caps["seeding"] is True
+
+
+def test_chatterbox_family_clones_without_ref_text():
+    for key in ("chatterbox", "chatterbox-turbo"):
+        caps = spec(key).capabilities()
+        assert caps["clone_voices"] is True
+        assert caps["clone_needs_ref_text"] is False
+    assert spec("soprano").capabilities()["clone_voices"] is False
 
 
 def test_unknown_engine_raises_with_the_known_list():

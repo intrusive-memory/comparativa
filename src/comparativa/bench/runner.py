@@ -32,7 +32,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
-from ..generation.episode import DEFAULT_SEED, MANIFEST_FILENAME
+from ..generation.episode import DEFAULT_SEED, MANIFEST_FILENAME, REPO_ROOT
 from .conditions import (
     BENCH_SPEECH_POLICY,
     Condition,
@@ -345,6 +345,11 @@ def child_command(run: BenchRun, *, m4a: bool = True) -> list[str]:
         "--seed",
         str(run.seed),
     ]
+    if run.condition.presets:
+        presets = Path(run.condition.presets)
+        if not presets.is_absolute():
+            presets = REPO_ROOT / presets
+        command += ["--presets", str(presets)]
     if not m4a:
         command.append("--no-m4a")
     return command

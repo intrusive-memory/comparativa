@@ -178,6 +178,22 @@ QWEN3_SAMPLING: Final = SamplingParams(
     source=f"{SWIFT_SOURCE}:97-113 (GenerationSettings.init defaults)",
 )
 
+#: Qwen3 **ICL voice cloning** (round 2, Base checkpoints): the Swift-parity
+#: values, except that ``repetition_penalty`` is recorded as 1.5 because that is
+#: what actually runs — mlx-audio's ICL path floors the penalty at 1.5
+#: (``qwen3_tts.py``: ``icl_rep_penalty = max(repetition_penalty, 1.5)``) to
+#: prevent codec degeneration after the long reference-audio prefill. Swift's
+#: default is 1.3, so this is a *known, recorded* divergence of the clone
+#: conditions, not a silent one; see ``docs/VOICE_CLONING.md``.
+QWEN3_ICL_SAMPLING: Final = QWEN3_SAMPLING.evolve(
+    repetition_penalty=1.5,
+    source=(
+        f"{SWIFT_SOURCE}:97-113, except repetition_penalty: mlx-audio 0.4.8 "
+        "qwen3_tts.py floors the ICL penalty at max(x, 1.5); the floored value "
+        "is recorded so the manifest states what actually ran"
+    ),
+)
+
 #: Chatterbox: mlx-audio's own defaults (`chatterbox.py:759-782`). No Swift
 #: analogue exists in this mission, so nothing is being matched.
 CHATTERBOX_SAMPLING: Final = SamplingParams(

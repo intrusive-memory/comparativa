@@ -12,15 +12,25 @@ Sortie 6 and the report in Sortie 11 are built from.
 Capability flags (:class:`EngineSpec`) are the honest summary of what each
 engine can do this round:
 
-============== ============= ============== ========= ==========
-engine         preset voices instruct       seeding   we chunk
-============== ============= ============== ========= ==========
-qwen3-1.7b     yes (9 spk)   yes            yes       yes
-qwen3-0.6b     yes (9 spk)   yes            yes       yes
-chatterbox     no (1 voice)  no             yes       yes
-chatterbox-turbo no (1 voice) no            yes       no (built in)
-soprano        no (1 voice)  no             yes       no (built in)
-============== ============= ============== ========= ==========
+================ ============= ============== ========= ========== ==========
+engine           preset voices instruct       seeding   we chunk   clones
+================ ============= ============== ========= ========== ==========
+qwen3-1.7b       yes (9 spk)   yes            yes       yes        no
+qwen3-0.6b       yes (9 spk)   yes            yes       yes        no
+qwen3-1.7b-clone no            no             yes       yes        yes (ICL)
+qwen3-0.6b-clone no            no             yes       yes        yes (ICL)
+chatterbox       no (1 voice)  no             yes       yes        yes (ref)
+chatterbox-turbo no (1 voice)  no             yes       no (built in) yes (ref)
+soprano          no (1 voice)  no             yes       no (built in) no
+================ ============= ============== ========= ========== ==========
+
+"Clones" (round 2) means the engine can take a **reference clip** and speak in
+that voice: the qwen3 ``*-clone`` engines run the Base checkpoints' ICL path
+(``ref_audio`` + ``ref_text``, both mandatory), and the chatterbox family
+conditions on reference audio alone. Reference material comes from the
+``.vox`` bundles (:mod:`comparativa.voices.vox`) via a :class:`CloneVoice` on
+the request. Prepared conditioning is cached per clone name so an episode pays
+the reference-encoding cost once per character, not once per line.
 
 "Seeding" means ``mx.random.seed`` is effective: every one of these engines
 samples through MLX's global RNG (``mlx_lm.sample_utils.make_sampler`` for
@@ -53,6 +63,7 @@ from ..voices import catalog
 from .sampling import (
     CHATTERBOX_SAMPLING,
     CHATTERBOX_TURBO_SAMPLING,
+    QWEN3_ICL_SAMPLING,
     QWEN3_SAMPLING,
     SOPRANO_SAMPLING,
     SamplingParams,
@@ -94,6 +105,10 @@ class EngineSpec:
     # --- capability flags ---------------------------------------------------
     #: True when several built-in voices exist and one must be selected.
     preset_voices: bool = False
+    #: True when the engine can speak in a reference clip's voice (round 2).
+    clone_voices: bool = False
+    #: True when cloning also requires the reference transcript (qwen3 ICL).
+    clone_needs_ref_text: bool = False
     #: True when a non-spoken performance direction can be passed through.
     accepts_instruct: bool = False
     #: True when ``mx.random.seed`` pins this engine's sampling.
@@ -111,8 +126,15 @@ class EngineSpec:
 
     @property
     def voices(self) -> tuple[catalog.Voice, ...]:
-        """The built-in voices, from Sortie 4's catalog."""
-        return catalog.engine(self.key).voices
+        """The built-in voices, from Sortie 4's catalog.
+
+        The round-2 clone engines have no catalog entry — their voices come
+        from ``.vox`` references, not from a preset list — so they report none.
+        """
+        try:
+            return catalog.engine(self.key).voices
+        except KeyError:
+            return ()
 
     @property
     def default_voice(self) -> str | None:
@@ -126,6 +148,8 @@ class EngineSpec:
         return {
             "preset_voices": self.preset_voices,
             "voice_count": len(self.voices),
+            "clone_voices": self.clone_voices,
+            "clone_needs_ref_text": self.clone_needs_ref_text,
             "accepts_instruct": self.accepts_instruct,
             "seeding": self.seeding,
             "seeding_note": self.seeding_note or (
@@ -166,12 +190,53 @@ ENGINE_SPECS: Final[dict[str, EngineSpec]] = {
         sample_rate=24000,
         notes=_QWEN3_NOTES,
     ),
+    "qwen3-1.7b-clone": EngineSpec(
+        key="qwen3-1.7b-clone",
+        family="qwen3_tts",
+        checkpoint="mlx-community/Qwen3-TTS-12Hz-1.7B-Base-bf16",
+        sampling=QWEN3_ICL_SAMPLING,
+        preset_voices=False,
+        clone_voices=True,
+        clone_needs_ref_text=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=24000,
+        notes=(
+            "Base checkpoint, ICL voice cloning: every line needs a CloneVoice "
+            "with ref audio AND ref text (qwen3_tts.py routes to _generate_icl "
+            "only when both are present). This is the same clone path "
+            "SwiftVoxAlta uses for .vox voices, so condition B vs A measures "
+            "the port, not the voice design. The Base path takes no instruct; "
+            "parentheticals are dropped (recorded in the manifest as "
+            "accepts_instruct=false). mlx-audio floors the ICL repetition "
+            "penalty at 1.5 -- QWEN3_ICL_SAMPLING records the floored value."
+        ),
+    ),
+    "qwen3-0.6b-clone": EngineSpec(
+        key="qwen3-0.6b-clone",
+        family="qwen3_tts",
+        checkpoint="mlx-community/Qwen3-TTS-12Hz-0.6B-Base-bf16",
+        sampling=QWEN3_ICL_SAMPLING,
+        preset_voices=False,
+        clone_voices=True,
+        clone_needs_ref_text=True,
+        accepts_instruct=False,
+        chunks_long_lines=True,
+        sample_rate=24000,
+        notes=(
+            "Size-degradation clone probe. NOTE: the 0.6B-Base checkpoint is "
+            "not in the local HF cache as of 2026-08-19 (refs only, no blobs); "
+            "loading it offline fails cleanly until it is prefetched with "
+            "`hf download mlx-community/Qwen3-TTS-12Hz-0.6B-Base-bf16`."
+        ),
+    ),
     "chatterbox": EngineSpec(
         key="chatterbox",
         family="chatterbox",
         checkpoint="mlx-community/chatterbox-fp16",
         sampling=CHATTERBOX_SAMPLING,
         preset_voices=False,
+        clone_voices=True,
         accepts_instruct=False,
         chunks_long_lines=True,
         sample_rate=24000,
@@ -189,6 +254,7 @@ ENGINE_SPECS: Final[dict[str, EngineSpec]] = {
         checkpoint="mlx-community/chatterbox-turbo-fp16",
         sampling=CHATTERBOX_TURBO_SAMPLING,
         preset_voices=False,
+        clone_voices=True,
         accepts_instruct=False,
         chunks_long_lines=False,
         sample_rate=24000,
@@ -226,6 +292,11 @@ SMOKE_ENGINE_KEYS: Final[tuple[str, ...]] = (
     "soprano",
 )
 
+#: The engines that can speak in a ``.vox`` reference voice (round 2).
+CLONE_ENGINE_KEYS: Final[tuple[str, ...]] = tuple(
+    key for key, s in ENGINE_SPECS.items() if s.clone_voices
+)
+
 
 def spec(key: str) -> EngineSpec:
     """Look up an :class:`EngineSpec`, raising ``KeyError`` if unknown."""
@@ -243,6 +314,31 @@ def spec(key: str) -> EngineSpec:
 
 
 @dataclass(frozen=True)
+class CloneVoice:
+    """A reference voice to clone (round 2), decoded and ready to condition on.
+
+    Built from a ``.vox`` bundle by the episode planner
+    (:mod:`comparativa.voices.cloned`); the engine layer only sees the decoded
+    waveform plus the transcript, never the bundle itself. ``name`` is the
+    stable cache key — one prepared conditioning per name per engine.
+    """
+
+    #: Stable identifier, e.g. ``"vox:ARCHER"``. Recorded as the line's voice.
+    name: str
+    #: 1-D float32 mono reference waveform.
+    audio: np.ndarray
+    sample_rate: int
+    #: Transcript of the reference clip; required by qwen3 ICL cloning.
+    ref_text: str | None = None
+    #: Provenance string for the manifest (vox path + member).
+    source: str = ""
+
+    @property
+    def seconds(self) -> float:
+        return len(self.audio) / self.sample_rate if self.sample_rate else 0.0
+
+
+@dataclass(frozen=True)
 class LineRequest:
     """One unit of speech to generate.
 
@@ -255,6 +351,8 @@ class LineRequest:
     text: str
     #: Preset speaker id; ``None`` uses the engine's single/default voice.
     voice: str | None = None
+    #: Reference voice to clone; requires an engine with ``clone_voices``.
+    clone: CloneVoice | None = None
     #: Non-spoken performance instruct; ignored by engines without the capability.
     direction: str | None = None
     #: Inter-breath spans. Empty or single-element means "no breath splicing".
@@ -404,6 +502,11 @@ class Engine:
         self.sampling = sampling or engine_spec.sampling
         self.load_seconds = load_seconds
         self.sample_rate = int(getattr(model, "sample_rate", engine_spec.sample_rate))
+        #: Prepared per-clone conditioning (chatterbox ``Conditionals``), keyed
+        #: by :attr:`CloneVoice.name` so a character's reference is encoded once.
+        self._conds_cache: dict[str, Any] = {}
+        #: Reference waveforms converted once to ``mx.array``, same key.
+        self._clone_audio_cache: dict[str, Any] = {}
 
     # -- properties ---------------------------------------------------------
 
@@ -415,6 +518,30 @@ class Engine:
         return f"<Engine {self.spec.key} @ {self.spec.checkpoint} sr={self.sample_rate}>"
 
     # -- voice resolution ---------------------------------------------------
+
+    def resolve_clone(self, clone: CloneVoice | None) -> CloneVoice | None:
+        """Validate a clone request against this engine's capabilities."""
+        if clone is None:
+            if self.spec.clone_voices and self.spec.clone_needs_ref_text:
+                raise EngineError(
+                    f"engine {self.spec.key!r} is a clone engine and requires a "
+                    "CloneVoice on every request (Base checkpoints have no "
+                    "preset voices)"
+                )
+            return None
+        if not self.spec.clone_voices:
+            raise EngineError(
+                f"engine {self.spec.key!r} cannot clone voices; clone engines: "
+                f"{', '.join(CLONE_ENGINE_KEYS)}"
+            )
+        if self.spec.clone_needs_ref_text and not (clone.ref_text or "").strip():
+            raise EngineError(
+                f"engine {self.spec.key!r} clones via ICL and needs the reference "
+                f"transcript, but clone {clone.name!r} has no ref_text"
+            )
+        if len(clone.audio) == 0:
+            raise EngineError(f"clone {clone.name!r} has an empty reference waveform")
+        return clone
 
     def resolve_voice(self, voice: str | None) -> str | None:
         """Validate ``voice`` against the catalog, or supply the default."""
@@ -465,37 +592,105 @@ class Engine:
         mx.random.seed(seed)
         return SEEDING_MLX_GLOBAL
 
-    def _call_model(self, text: str, voice: str | None, direction: str | None):
+    def _clone_ref_audio(self, clone: CloneVoice):
+        """The clone's waveform as an ``mx.array``, converted once per name."""
+        cached = self._clone_audio_cache.get(clone.name)
+        if cached is None:
+            import mlx.core as mx
+
+            cached = mx.array(clone.audio)
+            self._clone_audio_cache[clone.name] = cached
+        return cached
+
+    def _chatterbox_conds(self, clone: CloneVoice, exaggeration: float):
+        """Prepared ``Conditionals`` for a clone, encoded once per name.
+
+        Both chatterbox families resample the reference internally, so the
+        clone's native sample rate is passed through as-is.
+        """
+        conds = self._conds_cache.get(clone.name)
+        if conds is not None:
+            return conds
+        if self.spec.family == "chatterbox":
+            conds = self.model.prepare_conditionals(
+                self._clone_ref_audio(clone), clone.sample_rate, exaggeration
+            )
+        else:  # chatterbox_turbo: prepare stores on the model, returns nothing
+            self.model.prepare_conditionals(
+                self._clone_ref_audio(clone),
+                sample_rate=clone.sample_rate,
+                exaggeration=exaggeration,
+            )
+            conds = self.model._conds
+        self._conds_cache[clone.name] = conds
+        return conds
+
+    def _call_model(
+        self,
+        text: str,
+        voice: str | None,
+        direction: str | None,
+        clone: CloneVoice | None = None,
+    ):
         """Dispatch to the family-specific ``generate`` and return mono audio."""
         s = self.sampling
         family = self.spec.family
 
         if family == "qwen3_tts":
-            results = self.model.generate(
-                text=text,
-                voice=voice,
-                instruct=direction if self.spec.accepts_instruct else None,
-                temperature=s.temperature,
-                top_p=s.top_p,
-                top_k=s.top_k if s.top_k is not None else 0,
-                repetition_penalty=s.repetition_penalty,
-                max_tokens=s.max_tokens,
-                lang_code=QWEN3_LANGUAGE,
-                verbose=False,
-            )
+            if clone is not None:
+                if clone.sample_rate != self.sample_rate:
+                    raise EngineError(
+                        f"clone {clone.name!r} reference is {clone.sample_rate} Hz "
+                        f"but {self.spec.key} expects {self.sample_rate} Hz"
+                    )
+                # Base-checkpoint ICL path: ref audio + transcript, no preset
+                # voice, no instruct (qwen3_tts.py routes on ref_audio+ref_text).
+                results = self.model.generate(
+                    text=text,
+                    ref_audio=self._clone_ref_audio(clone),
+                    ref_text=clone.ref_text,
+                    temperature=s.temperature,
+                    top_p=s.top_p,
+                    top_k=s.top_k if s.top_k is not None else 0,
+                    repetition_penalty=s.repetition_penalty,
+                    max_tokens=s.max_tokens,
+                    lang_code=QWEN3_LANGUAGE,
+                    verbose=False,
+                )
+            else:
+                results = self.model.generate(
+                    text=text,
+                    voice=voice,
+                    instruct=direction if self.spec.accepts_instruct else None,
+                    temperature=s.temperature,
+                    top_p=s.top_p,
+                    top_k=s.top_k if s.top_k is not None else 0,
+                    repetition_penalty=s.repetition_penalty,
+                    max_tokens=s.max_tokens,
+                    lang_code=QWEN3_LANGUAGE,
+                    verbose=False,
+                )
         elif family == "chatterbox":
+            exaggeration = s.extra.get("exaggeration", 0.1)
             results = self.model.generate(
                 text=text,
+                conds=self._chatterbox_conds(clone, exaggeration) if clone else None,
                 temperature=s.temperature,
                 top_p=s.top_p,
                 repetition_penalty=s.repetition_penalty,
                 min_p=s.extra.get("min_p", 0.05),
                 cfg_weight=s.extra.get("cfg_weight", 0.5),
-                exaggeration=s.extra.get("exaggeration", 0.1),
+                exaggeration=exaggeration,
                 max_new_tokens=s.max_tokens,
                 verbose=False,
             )
         elif family == "chatterbox_turbo":
+            if clone is not None:
+                # prepare_conditionals stores on the model; restore the cached
+                # conditioning so interleaved characters do not re-encode.
+                self.model._conds = self._chatterbox_conds(
+                    clone, s.extra.get("exaggeration", 0.0)
+                )
             results = self.model.generate(
                 text=text,
                 temperature=s.temperature,
@@ -528,10 +723,11 @@ class Engine:
         voice: str | None,
         direction: str | None,
         seed: int | None,
+        clone: CloneVoice | None = None,
     ) -> tuple[np.ndarray, ChunkRecord, str]:
         """Generate one chunk, retrying once if it fails the duration check."""
         seeding = self._seed(seed)
-        audio = self._call_model(text, voice, direction)
+        audio = self._call_model(text, voice, direction, clone)
         duration = len(audio) / self.sample_rate if self.sample_rate else 0.0
         check = check_duration(text, duration)
 
@@ -541,7 +737,7 @@ class Engine:
         # One retry, on a different point of the sample stream (Risk §8.3).
         retry_seed = None if seed is None else seed + 1_000_003
         seeding = self._seed(retry_seed)
-        retry_audio = self._call_model(text, voice, direction)
+        retry_audio = self._call_model(text, voice, direction, clone)
         retry_duration = len(retry_audio) / self.sample_rate if self.sample_rate else 0.0
         retry_check = check_duration(text, retry_duration)
 
@@ -564,7 +760,8 @@ class Engine:
 
     def generate_line(self, request: LineRequest) -> LineResult:
         """Generate one line of speech with fixed, recorded parameters."""
-        voice = self.resolve_voice(request.voice)
+        clone = self.resolve_clone(request.clone)
+        voice = clone.name if clone is not None else self.resolve_voice(request.voice)
         direction = request.direction if self.spec.accepts_instruct else None
 
         result = LineResult(
@@ -597,7 +794,7 @@ class Engine:
                     )
                 seed = None if request.seed is None else request.seed + chunk_index
                 audio, record, seeding = self._generate_chunk(
-                    chunk_index, chunk_text, voice, direction, seed
+                    chunk_index, chunk_text, voice, direction, seed, clone
                 )
                 result.seeding = seeding
                 result.chunks.append(record)
