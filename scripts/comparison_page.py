@@ -45,6 +45,15 @@ CONDITION_LABELS: dict[str, str] = {
     "T": "Python · chatterbox-turbo · default voice",
 }
 
+#: Default/single-voice renders whose player is redundant once the same
+#: engine's **cloned** render exists (the stats table still lists them).
+#: E (Soprano) has no entry: Soprano cannot clone — its one voice is baked in
+#: (soprano.py:387 discards the `voice` argument) — so E is Soprano's only
+#: render and always keeps its player.
+SUPERSEDED_BY_CLONE: dict[str, str] = {
+    "D": "G",  # chatterbox default -> chatterbox .vox-cloned
+}
+
 _WS = re.compile(r"\s+")
 _TAG = re.compile(r"<[^>]+>")
 _TIME = re.compile(r"(?:(\d+):)?(\d{1,2}):(\d{2})\.(\d{3})")
@@ -296,7 +305,14 @@ def render(episodes, transcripts, skipped) -> str:
         parts.append(f"<p class='note'>Skipped conditions: {html.escape(names)} — see bench/&lt;cond&gt;/SKIPPED.md.</p>")
 
     for episode in sorted(episodes):
-        rows = episodes[episode]
+        all_rows = episodes[episode]
+        # A default-voice render's player is dropped when its cloned sibling
+        # was generated for this episode (the perf table above keeps it).
+        rows = {
+            cond: row
+            for cond, row in all_rows.items()
+            if SUPERSEDED_BY_CLONE.get(cond) not in all_rows
+        }
         transcript = transcripts.get(episode) or []
         offsets = {cond: row.offsets for cond, row in rows.items() if row.offsets}
         parts.append(f"<section data-episode='{html.escape(episode)}'>")
@@ -343,8 +359,13 @@ def main() -> int:
         print("no completed cells under bench/")
         return 1
     OUT.write_text(render(episodes, transcripts, skipped), encoding="utf-8")
-    cells = sum(len(r) for r in episodes.values())
-    print(f"wrote {OUT} ({len(episodes)} episode(s), {cells} players)")
+    players = sum(
+        1
+        for rows in episodes.values()
+        for cond in rows
+        if SUPERSEDED_BY_CLONE.get(cond) not in rows
+    )
+    print(f"wrote {OUT} ({len(episodes)} episode(s), {players} players)")
     return 0
 
 
