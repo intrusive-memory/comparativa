@@ -1,6 +1,6 @@
 # REPORT — OPERATION BATTLING BARDS round 1
 
-_generated 2026-08-16T21:43:28 by `comparativa report`_
+_generated 2026-08-19T11:20:12 by `comparativa report`_
 
 bench dir: `bench`
 
@@ -15,12 +15,16 @@ bench dir: `bench`
 | --- | --- | --- | --- | --- | --- | --- |
 | A | episode_1_01_cold_open | swift | produciesta | 2772.940 | 2.590 | 5270929408 |
 | A | episode_1_01a_bumper_donnie_and_arnie_1 | swift | produciesta | 350.220 | 2.488 | 9241870336 |
+| B | episode_1_01_cold_open | python | qwen3-1.7b-clone | 789.031 | 0.760 | 4899520512 |
+| B | episode_1_01a_bumper_donnie_and_arnie_1 | python | qwen3-1.7b-clone | 164.509 | 1.241 | 4758913024 |
 | C | episode_1_01_cold_open | python | qwen3-1.7b | 727.546 | 0.606 | 5166563328 |
 | C | episode_1_01a_bumper_donnie_and_arnie_1 | python | qwen3-1.7b | 89.176 | 0.594 | 4841488384 |
 | D | episode_1_01_cold_open | python | chatterbox | 617.921 | 0.816 | 3544875008 |
 | D | episode_1_01a_bumper_donnie_and_arnie_1 | python | chatterbox | 75.005 | 0.738 | 3361669120 |
 | E | episode_1_01_cold_open | python | soprano | 158.912 | 0.131 | 1040449536 |
 | E | episode_1_01a_bumper_donnie_and_arnie_1 | python | soprano | 20.879 | 0.110 | 548421632 |
+| G | episode_1_01_cold_open | python | chatterbox | 894.209 | 0.887 | 3659431936 |
+| G | episode_1_01a_bumper_donnie_and_arnie_1 | python | chatterbox | 89.179 | 0.759 | 3371466752 |
 
 ## Listening scores
 
