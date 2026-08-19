@@ -45,13 +45,13 @@ CONDITION_LABELS: dict[str, str] = {
     "T": "Python · chatterbox-turbo · default voice",
 }
 
-#: Conditions whose *player* is hidden (the stats table still lists every
-#: generated cell). User rulings, 2026-08-19: engines need multiple voices —
-#: Soprano's single baked-in voice disqualifies it (soprano.py:387 discards
-#: the `voice` argument) — and the Python Qwen conditions are out of
-#: consideration; condition A stays as the Produciesta reference ("we'll just
-#: know it's Qwen").
-PLAYER_EXCLUSIONS: dict[str, str] = {
+#: Conditions removed from consideration — hidden from the players AND the
+#: stats grid (their bench cells stay on disk and in REPORT.md). User rulings,
+#: 2026-08-19: engines need multiple voices — Soprano's single baked-in voice
+#: disqualifies it (soprano.py:387 discards the `voice` argument) — and the
+#: Python Qwen conditions are out of consideration; condition A stays as the
+#: Produciesta reference ("we'll just know it's Qwen").
+EXCLUDED_CONDITIONS: dict[str, str] = {
     "B": "qwen removed from consideration",
     "C": "qwen removed from consideration",
     "D": "superseded by G (same engine, cloned voices)",
@@ -291,11 +291,13 @@ def render(episodes, transcripts, skipped) -> str:
         "<code>uv run python scripts/comparison_page.py</code>.</p>"
     )
 
-    # Performance summary table.
+    # Performance summary table — active conditions only.
     parts.append("<table class='perf'><tr><th>cond</th><th>voices / stack</th><th>episode</th>"
                  "<th class='num'>audio</th><th class='num'>wall</th><th class='num'>RTF</th></tr>")
     for episode in sorted(episodes):
         for cond, row in sorted(episodes[episode].items()):
+            if cond in EXCLUDED_CONDITIONS:
+                continue
             dur = f"{row.duration/60:.1f} min" if row.duration else "–"
             wall = f"{row.wall/60:.1f} min" if row.wall else "–"
             rtf = f"{row.rtf:.3f}" if row.rtf is not None else "–"
@@ -312,7 +314,7 @@ def render(episodes, transcripts, skipped) -> str:
     for episode in sorted(episodes):
         all_rows = episodes[episode]
         rows = {
-            cond: row for cond, row in all_rows.items() if cond not in PLAYER_EXCLUSIONS
+            cond: row for cond, row in all_rows.items() if cond not in EXCLUDED_CONDITIONS
         }
         transcript = transcripts.get(episode) or []
         offsets = {cond: row.offsets for cond, row in rows.items() if row.offsets}
@@ -361,7 +363,7 @@ def main() -> int:
         return 1
     OUT.write_text(render(episodes, transcripts, skipped), encoding="utf-8")
     players = sum(
-        1 for rows in episodes.values() for cond in rows if cond not in PLAYER_EXCLUSIONS
+        1 for rows in episodes.values() for cond in rows if cond not in EXCLUDED_CONDITIONS
     )
     print(f"wrote {OUT} ({len(episodes)} episode(s), {players} players)")
     return 0
