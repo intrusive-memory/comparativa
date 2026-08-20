@@ -1,4 +1,12 @@
-"""``comparativa voices`` — roster + per-engine default-voice assignments."""
+"""``comparativa voices`` — roster + per-engine voice assignments.
+
+Two modes:
+
+* ``--mode defaults`` (round 1, the default): built-in preset voices,
+  auto-assigned from ``CAST.md`` keywords → ``presets.yaml``.
+* ``--mode cloned`` (round 2): every clone-capable engine conditions on the
+  character's ``.vox`` reference → ``presets-cloned.yaml``.
+"""
 
 from __future__ import annotations
 
@@ -8,11 +16,18 @@ from pathlib import Path
 
 from .assign import PRESETS_FILENAME, Assignments, assign, dump_yaml, to_document, write_presets
 from .catalog import ENGINES, ENGINE_KEYS, engine as get_engine
+from .cloned import (
+    CLONED_ENGINE_KEYS,
+    PRESETS_CLONED_FILENAME,
+    build_cloned_document,
+    unresolved_characters,
+)
 from .roster import RosterError, load_roster
 
 #: Repository root, where the committed ``presets.yaml`` lives.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PRESETS_PATH = REPO_ROOT / PRESETS_FILENAME
+DEFAULT_CLONED_PRESETS_PATH = REPO_ROOT / PRESETS_CLONED_FILENAME
 
 #: Where ``--audition`` writes its takes (gitignored, like every audio output).
 DEFAULT_AUDITION_DIR = "out/audition"
@@ -27,9 +42,22 @@ def configure(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         help="Podcast project directory containing CAST.md (read-only). Omit to print this help.",
     )
     parser.add_argument(
+        "--mode",
+        choices=("defaults", "cloned"),
+        default="defaults",
+        help=(
+            "defaults: round-1 built-in preset voices (presets.yaml). "
+            "cloned: round-2 .vox-cloned voices (presets-cloned.yaml)."
+        ),
+    )
+    parser.add_argument(
         "--engines",
-        default=",".join(ENGINE_KEYS),
-        help=f"Comma-separated engine keys (default: all — {', '.join(ENGINE_KEYS)}).",
+        default=None,
+        help=(
+            "Comma-separated engine keys (defaults mode default: "
+            f"{', '.join(ENGINE_KEYS)}; cloned mode default: "
+            f"{', '.join(CLONED_ENGINE_KEYS)})."
+        ),
     )
     parser.add_argument(
         "--write",
@@ -120,7 +148,12 @@ def handle(args: argparse.Namespace) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    keys = [key.strip() for key in str(args.engines).split(",") if key.strip()]
+    if args.mode == "cloned":
+        return handle_cloned(args, roster)
+
+    keys = [
+        key.strip() for key in str(args.engines or ",".join(ENGINE_KEYS)).split(",") if key.strip()
+    ]
     try:
         engines = tuple(get_engine(key) for key in keys) if keys else ENGINES
     except KeyError as exc:
@@ -155,6 +188,87 @@ def handle(args: argparse.Namespace) -> int:
     if args.audition:
         return run_audition_from_args(args, assignments)
 
+    return 0
+
+
+def _cloned_cell(entry: object) -> str:
+    """One character × engine cell of the cloned-mode table."""
+    if entry is None:
+        return "UNRESOLVED"
+    if isinstance(entry, dict):
+        if entry.get("mode") == "clone":
+            return f"clone {entry.get('model_size')} ({entry.get('ref_seconds')}s)"
+        return str(entry.get("voice") or entry.get("mode") or "?")
+    return str(entry)
+
+
+def render_cloned_table(document: dict) -> str:
+    """Render the cloned assignments as a fixed-width table."""
+    engine_keys = list(document.get("engines") or {})
+    headers = ["CHARACTER", *(k.upper() for k in engine_keys)]
+    rows = [
+        [character, *(_cloned_cell((record.get("engines") or {}).get(k)) for k in engine_keys)]
+        for character, record in (document.get("assignments") or {}).items()
+    ]
+    widths = [
+        max(len(headers[i]), *(len(r[i]) for r in rows)) if rows else len(headers[i])
+        for i in range(len(headers))
+    ]
+    lines = [
+        "  ".join(headers[i].ljust(widths[i]) for i in range(len(headers))).rstrip(),
+        "  ".join("-" * widths[i] for i in range(len(headers))),
+    ]
+    lines.extend(
+        "  ".join(row[i].ljust(widths[i]) for i in range(len(headers))).rstrip()
+        for row in rows
+    )
+    return "\n".join(lines)
+
+
+def handle_cloned(args: argparse.Namespace, roster) -> int:
+    """``voices --mode cloned``: build/write the .vox-cloned assignments."""
+    from .cloned import ClonedVoicesError
+
+    keys = tuple(
+        key.strip()
+        for key in str(args.engines or ",".join(CLONED_ENGINE_KEYS)).split(",")
+        if key.strip()
+    )
+    try:
+        document = build_cloned_document(roster, keys or CLONED_ENGINE_KEYS)
+    except ClonedVoicesError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+    if args.audition:
+        print("error: --audition is a defaults-mode feature (round 1)", file=sys.stderr)
+        return 2
+
+    if args.format == "yaml":
+        print(dump_yaml(document), end="")
+    else:
+        print(f"{roster.cast_file}  ({len(roster)} characters, cloned mode)")
+        print(render_cloned_table(document))
+        for character, record in (document.get("assignments") or {}).items():
+            for note in record.get("notes") or []:
+                print(f"note: {character}: {note}")
+
+    if args.write:
+        target = Path(args.write).expanduser()
+        # Never let cloned output land on the round-1 defaults file.
+        if target.resolve() == DEFAULT_PRESETS_PATH.resolve():
+            target = DEFAULT_CLONED_PRESETS_PATH
+        target.write_text(dump_yaml(document), encoding="utf-8")
+        print(f"wrote {target}")
+
+    problems = unresolved_characters(document)
+    if problems:
+        for character, engine_keys in problems.items():
+            print(
+                f"error: {character} has no voice for: {', '.join(engine_keys)}",
+                file=sys.stderr,
+            )
+        return 1
     return 0
 
 

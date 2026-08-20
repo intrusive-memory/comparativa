@@ -63,9 +63,14 @@ uv run pytest --smoke    # + engine smoke and the full-episode integration test
   `bench/`, `eval/`, with `cli.py` as the entry point.
 - `scripts/` — the condition-A Swift-baseline wrapper and its metrics
   extractor.
-- `presets.yaml` — voice/engine presets.
+- `presets.yaml` — round-1 voice/engine presets (defaults-only, schema 1).
+- `presets-cloned.yaml` — round-2 `.vox`-cloned voice assignments (schema 2),
+  regenerated with `comparativa voices <project> --mode cloned --write`; see
+  `docs/VOICE_CLONING.md`. The `.vox` bundles themselves stay untracked with
+  the corpus.
 - `docs/` — design and parity documents (text prep, sampling parity, assembly,
-  bench matrix, corpus pin, Swift baseline, condition-F recon, ease of use).
+  bench matrix, corpus pin, Swift baseline, condition-F recon, ease of use,
+  voice cloning).
 - `REQUIREMENTS.md` — locked requirements. Treat as read-only unless the user
   explicitly reopens them.
 - `EXECUTION_PLAN.md`, `SUPERVISOR_STATE.md`, `REPORT.md` — mission-supervisor

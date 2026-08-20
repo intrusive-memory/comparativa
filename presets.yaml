@@ -4,7 +4,7 @@ policy: 'Round 1 is defaults-only (EXECUTION_PLAN.md RD-2): built-in/default voi
   from CAST.md voicePrompt keywords. voices.voxalta paths are recorded for the future cloning mission
   and are never opened.'
 source:
-  project_dir: ~/Projects/podcasts/granville
+  project_dir: ~/Projects/comparativa/corpus/frozen
   cast_file: CAST.md
   cast_sha256: eb4665acd70d696c5f5894c83bb6492fe420086d6ae6b35a9ce318623c13daba
   cast_size: 25
@@ -156,6 +156,211 @@ engines:
       language: en
       assignable: true
       note: '''builtin_voice'' conds.safetensors (chatterbox_turbo.py:317).'
+  kokoro:
+    checkpoint: mlx-community/Kokoro-82M-bf16
+    role: condition K (round-3 presets control)
+    multi_voice: true
+    voices_verified_locally: true
+    voice_list_source: voices/*.safetensors in the local snapshot of mlx-community/Kokoro-82M-bf16 (verified
+      2026-08-19); gender/accent from the a|b + f|m prefix convention
+    voices:
+    - name: af_heart
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_alloy
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_aoede
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_bella
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_jessica
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_kore
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_nicole
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_nova
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_river
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_sarah
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: af_sky
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_adam
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_echo
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_eric
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_fenrir
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_liam
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_michael
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_onyx
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_puck
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: am_santa
+      gender: male
+      age_band: elder
+      language: en
+      assignable: true
+      note: Elder-presenting novelty preset.
+    - name: bf_alice
+      gender: female
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bf_emma
+      gender: female
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bf_isabella
+      gender: female
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bf_lily
+      gender: female
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bm_daniel
+      gender: male
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bm_fable
+      gender: male
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bm_george
+      gender: male
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+    - name: bm_lewis
+      gender: male
+      age_band: adult
+      language: en-GB
+      assignable: false
+      note: en-GB; excluded per the en-US-only ruling.
+  orpheus:
+    checkpoint: mlx-community/orpheus-3b-0.1-ft-bf16
+    role: condition O (round-3 presets, Llama backbone)
+    multi_voice: true
+    voices_verified_locally: false
+    voice_list_source: Canopy Labs orpheus-3b-0.1-ft model card voice list (tara, leah, jess, leo, dan,
+      mia, zac, zoe)
+    voices:
+    - name: tara
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: leah
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: jess
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: leo
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: dan
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: mia
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
+    - name: zac
+      gender: male
+      age_band: adult
+      language: en
+      assignable: true
+    - name: zoe
+      gender: female
+      age_band: adult
+      language: en
+      assignable: true
   soprano:
     checkpoint: mlx-community/Soprano-80M-bf16
     role: condition E (Python Soprano, paired with Swift condition F)
@@ -180,6 +385,8 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_adam
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/ARCHER.vox
@@ -193,6 +400,8 @@ assignments:
       qwen3-0.6b: aiden
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_echo
+      orpheus: dan
       soprano: default
     voxalta:
     - voices/BECKETT.vox
@@ -206,6 +415,8 @@ assignments:
       qwen3-0.6b: uncle_fu
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_eric
+      orpheus: zac
       soprano: default
     voxalta:
     - voices/CLARK.vox
@@ -219,6 +430,8 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_fenrir
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/CYRUS.vox
@@ -232,12 +445,16 @@ assignments:
       qwen3-0.6b: serena
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_heart
+      orpheus: tara
       soprano: default
     voxalta:
     - voices/DONNA.vox
     notes:
     - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''serena'''
     - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''serena'''
+    - 'kokoro: no elder preset available; fell back to the adult voice ''af_heart'''
+    - 'orpheus: no elder preset available; fell back to the adult voice ''tara'''
   DUKE:
     gender: male
     gender_source: prompt:explicit-gender-word
@@ -248,9 +465,13 @@ assignments:
       qwen3-0.6b: uncle_fu
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_santa
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/DUKE.vox
+    notes:
+    - 'orpheus: no elder preset available; fell back to the adult voice ''leo'''
   GARETH:
     gender: male
     gender_source: prompt:explicit-gender-word
@@ -261,6 +482,8 @@ assignments:
       qwen3-0.6b: aiden
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_liam
+      orpheus: dan
       soprano: default
     voxalta:
     - voices/GARETH.vox
@@ -274,6 +497,8 @@ assignments:
       qwen3-0.6b: uncle_fu
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_michael
+      orpheus: zac
       soprano: default
     voxalta:
     - voices/HUNTER.vox
@@ -287,12 +512,16 @@ assignments:
       qwen3-0.6b: vivian
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_alloy
+      orpheus: leah
       soprano: default
     voxalta:
     - voices/IOLA.vox
     notes:
     - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''vivian'''
     - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''vivian'''
+    - 'kokoro: no elder preset available; fell back to the adult voice ''af_alloy'''
+    - 'orpheus: no elder preset available; fell back to the adult voice ''leah'''
   JOANN:
     gender: female
     gender_source: prompt:voice-type-word
@@ -303,12 +532,16 @@ assignments:
       qwen3-0.6b: ono_anna
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_aoede
+      orpheus: jess
       soprano: default
     voxalta:
     - voices/JOANN.vox
     notes:
     - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''ono_anna'''
     - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''ono_anna'''
+    - 'kokoro: no elder preset available; fell back to the adult voice ''af_aoede'''
+    - 'orpheus: no elder preset available; fell back to the adult voice ''jess'''
   KEVIN:
     gender: male
     gender_source: prompt:explicit-gender-word
@@ -319,6 +552,8 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_onyx
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/KEVIN.vox
@@ -332,6 +567,8 @@ assignments:
       qwen3-0.6b: aiden
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_puck
+      orpheus: dan
       soprano: default
     voxalta:
     - voices/KIERAN.vox
@@ -345,12 +582,16 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_adam
+      orpheus: dan
       soprano: default
     voxalta:
     - voices/LEROY.vox
     notes:
     - 'qwen3-1.7b: no elder preset available; fell back to the adult voice ''ryan'''
     - 'qwen3-0.6b: no elder preset available; fell back to the adult voice ''ryan'''
+    - 'kokoro: no elder preset available; fell back to the adult voice ''am_adam'''
+    - 'orpheus: no elder preset available; fell back to the adult voice ''dan'''
   LINC:
     gender: male
     gender_source: prompt:explicit-gender-word
@@ -361,6 +602,8 @@ assignments:
       qwen3-0.6b: uncle_fu
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_santa
+      orpheus: zac
       soprano: default
     voxalta:
     - voices/LINC.vox
@@ -374,6 +617,8 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_adam
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/MARSHALL.vox
@@ -387,6 +632,8 @@ assignments:
       qwen3-0.6b: aiden
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_echo
+      orpheus: dan
       soprano: default
     voxalta:
     - voices/NARRATOR.vox
@@ -400,6 +647,8 @@ assignments:
       qwen3-0.6b: serena
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_heart
+      orpheus: tara
       soprano: default
     voxalta:
     - voices/PREDATOR_MOM_1.vox
@@ -413,6 +662,8 @@ assignments:
       qwen3-0.6b: vivian
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_alloy
+      orpheus: leah
       soprano: default
     voxalta:
     - voices/PREDATOR_MOM_2.vox
@@ -426,6 +677,8 @@ assignments:
       qwen3-0.6b: ono_anna
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_aoede
+      orpheus: jess
       soprano: default
     voxalta:
     - voices/PREDATOR_MOM_3.vox
@@ -439,6 +692,8 @@ assignments:
       qwen3-0.6b: sohee
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: af_bella
+      orpheus: mia
       soprano: default
     voxalta:
     - voices/PRINCIPAL.vox
@@ -452,6 +707,8 @@ assignments:
       qwen3-0.6b: uncle_fu
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_eric
+      orpheus: zac
       soprano: default
     voxalta:
     - voices/RAY.vox
@@ -465,6 +722,8 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_fenrir
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/SHANE.vox
@@ -478,6 +737,8 @@ assignments:
       qwen3-0.6b: aiden
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_liam
+      orpheus: dan
       soprano: default
     voxalta:
     - voices/SPENCER.vox
@@ -491,12 +752,16 @@ assignments:
       qwen3-0.6b: ryan
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_adam
+      orpheus: leo
       soprano: default
     voxalta:
     - voices/TOBY.vox
     notes:
     - 'qwen3-1.7b: no child preset available; fell back to the adult voice ''ryan'''
     - 'qwen3-0.6b: no child preset available; fell back to the adult voice ''ryan'''
+    - 'kokoro: no child preset available; fell back to the adult voice ''am_adam'''
+    - 'orpheus: no child preset available; fell back to the adult voice ''leo'''
   TUCKER:
     gender: male
     gender_source: prompt:explicit-gender-word
@@ -507,6 +772,8 @@ assignments:
       qwen3-0.6b: uncle_fu
       chatterbox: default
       chatterbox-turbo: default
+      kokoro: am_michael
+      orpheus: zac
       soprano: default
     voxalta:
     - voices/TUCKER.vox

@@ -128,6 +128,49 @@ _QWEN3_SOURCE = (
     "consumed by mlx_audio/tts/models/qwen3_tts/qwen3_tts.py:193"
 )
 
+# --- Kokoro-82M preset voices -------------------------------------------------
+#
+# The 28 English voices present in the local snapshot of
+# mlx-community/Kokoro-82M-bf16 (voices/*.safetensors, verified 2026-08-19).
+# Prefix encodes accent+gender: a=American/b=British, f=female/m=male. The
+# non-English voice packs in the repo are excluded from assignment outright.
+_KOKORO_VOICES: tuple[Voice, ...] = tuple(
+    [Voice(f"af_{n}", "female", "adult", "en") for n in (
+        "heart", "alloy", "aoede", "bella", "jessica", "kore", "nicole",
+        "nova", "river", "sarah", "sky",
+    )]
+    + [Voice(f"am_{n}", "male", "adult", "en") for n in (
+        "adam", "echo", "eric", "fenrir", "liam", "michael", "onyx", "puck",
+    )]
+    + [Voice("am_santa", "male", "elder", "en", note="Elder-presenting novelty preset.")]
+    # British packs are recorded but NOT assignable: user ruling 2026-08-19,
+    # this project's generations are en-US only — no British/Australian accents.
+    + [Voice(f"bf_{n}", "female", "adult", "en-GB", assignable=False,
+             note="en-GB; excluded per the en-US-only ruling.") for n in (
+        "alice", "emma", "isabella", "lily",
+    )]
+    + [Voice(f"bm_{n}", "male", "adult", "en-GB", assignable=False,
+             note="en-GB; excluded per the en-US-only ruling.") for n in (
+        "daniel", "fable", "george", "lewis",
+    )]
+)
+
+# --- Orpheus 3B preset voices ---------------------------------------------------
+#
+# The eight voices documented by Canopy Labs for orpheus-3b-0.1-ft (model card
+# lists them in order of conversational realism: tara, leah, jess, leo, dan,
+# mia, zac, zoe). Genders per the model card's descriptions.
+_ORPHEUS_VOICES: tuple[Voice, ...] = (
+    Voice("tara", "female", "adult", "en"),
+    Voice("leah", "female", "adult", "en"),
+    Voice("jess", "female", "adult", "en"),
+    Voice("leo", "male", "adult", "en"),
+    Voice("dan", "male", "adult", "en"),
+    Voice("mia", "female", "adult", "en"),
+    Voice("zac", "male", "adult", "en"),
+    Voice("zoe", "female", "adult", "en"),
+)
+
 ENGINES: tuple[Engine, ...] = (
     Engine(
         key="qwen3-1.7b",
@@ -184,6 +227,31 @@ ENGINES: tuple[Engine, ...] = (
         source="conds.safetensors in the checkpoint; mlx_audio/tts/models/chatterbox_turbo/chatterbox_turbo.py:317",
         multi_voice=False,
         role="optional speed probe",
+    ),
+    Engine(
+        key="kokoro",
+        checkpoint="mlx-community/Kokoro-82M-bf16",
+        voices=_KOKORO_VOICES,
+        source=(
+            "voices/*.safetensors in the local snapshot of "
+            "mlx-community/Kokoro-82M-bf16 (verified 2026-08-19); gender/accent "
+            "from the a|b + f|m prefix convention"
+        ),
+        multi_voice=True,
+        voices_verified_locally=True,
+        role="condition K (round-3 presets control)",
+    ),
+    Engine(
+        key="orpheus",
+        checkpoint="mlx-community/orpheus-3b-0.1-ft-bf16",
+        voices=_ORPHEUS_VOICES,
+        source=(
+            "Canopy Labs orpheus-3b-0.1-ft model card voice list (tara, leah, "
+            "jess, leo, dan, mia, zac, zoe)"
+        ),
+        multi_voice=True,
+        voices_verified_locally=False,
+        role="condition O (round-3 presets, Llama backbone)",
     ),
     Engine(
         key="soprano",

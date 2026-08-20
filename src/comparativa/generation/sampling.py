@@ -178,6 +178,22 @@ QWEN3_SAMPLING: Final = SamplingParams(
     source=f"{SWIFT_SOURCE}:97-113 (GenerationSettings.init defaults)",
 )
 
+#: Qwen3 **ICL voice cloning** (round 2, Base checkpoints): the Swift-parity
+#: values, except that ``repetition_penalty`` is recorded as 1.5 because that is
+#: what actually runs — mlx-audio's ICL path floors the penalty at 1.5
+#: (``qwen3_tts.py``: ``icl_rep_penalty = max(repetition_penalty, 1.5)``) to
+#: prevent codec degeneration after the long reference-audio prefill. Swift's
+#: default is 1.3, so this is a *known, recorded* divergence of the clone
+#: conditions, not a silent one; see ``docs/VOICE_CLONING.md``.
+QWEN3_ICL_SAMPLING: Final = QWEN3_SAMPLING.evolve(
+    repetition_penalty=1.5,
+    source=(
+        f"{SWIFT_SOURCE}:97-113, except repetition_penalty: mlx-audio 0.4.8 "
+        "qwen3_tts.py floors the ICL penalty at max(x, 1.5); the floored value "
+        "is recorded so the manifest states what actually ran"
+    ),
+)
+
 #: Chatterbox: mlx-audio's own defaults (`chatterbox.py:759-782`). No Swift
 #: analogue exists in this mission, so nothing is being matched.
 CHATTERBOX_SAMPLING: Final = SamplingParams(
@@ -210,4 +226,68 @@ SOPRANO_SAMPLING: Final = SamplingParams(
     top_p=0.95,
     max_tokens=512,
     source="mlx_audio/tts/models/soprano/soprano.py:362-371 (library defaults)",
+)
+
+# --- round-3 challenger engines (no Swift analogue; library defaults) --------
+
+#: Dia (Nari Labs): `dia.py:234-246` library defaults. ``max_tokens=0`` is the
+#: recorded sentinel for "model default" — the adapter passes ``None`` and Dia
+#: falls back to ``config.data.audio_length`` (dia.py:339).
+DIA_SAMPLING: Final = SamplingParams(
+    temperature=1.3,
+    top_p=0.95,
+    max_tokens=0,
+    extra={"max_tokens_note_config_default": 1.0},
+    source=(
+        "mlx_audio/tts/models/dia/dia.py:234-246 (library defaults; max_tokens "
+        "0 = config.data.audio_length, dia.py:339)"
+    ),
+)
+
+#: Sesame CSM-1B: the default sampler is `make_sampler(temp=0.9, top_k=50)`
+#: (sesame.py:767); the 90-second cap is the `max_audio_length_ms` default.
+CSM_SAMPLING: Final = SamplingParams(
+    temperature=0.9,
+    top_p=1.0,
+    top_k=50,
+    max_tokens=0,
+    extra={"max_audio_length_ms": 90_000.0},
+    source=(
+        "mlx_audio/tts/models/sesame/sesame.py:767 (default sampler "
+        "make_sampler(temp=0.9, top_k=50)); max_audio_length_ms=90000 "
+        "(generate signature default)"
+    ),
+)
+
+#: Higgs Audio v2: `higgs_audio/model.py:121-140` library defaults.
+#: ``max_tokens`` maps onto ``max_new_frames`` (one frame ≈ 40 ms).
+HIGGS_SAMPLING: Final = SamplingParams(
+    temperature=0.7,
+    top_p=0.95,
+    max_tokens=1200,
+    source=(
+        "mlx_audio/tts/models/higgs_audio/model.py:121-140 (library defaults; "
+        "max_tokens -> max_new_frames, ~40 ms per frame)"
+    ),
+)
+
+#: Kokoro-82M exposes no sampling knobs at all — a deterministic duration
+#: model plus vocoder (kokoro.py generate: voice/speed/lang_code only). The
+#: zeros here are recorded sentinels, not choices.
+KOKORO_SAMPLING: Final = SamplingParams(
+    temperature=0.0,
+    top_p=1.0,
+    max_tokens=0,
+    source=(
+        "mlx_audio/tts/models/kokoro/kokoro.py (generate exposes no sampling "
+        "parameters; deterministic pipeline)"
+    ),
+)
+
+#: Orpheus 3B (llama family): `llama.py generate` library defaults.
+ORPHEUS_SAMPLING: Final = SamplingParams(
+    temperature=0.6,
+    top_p=0.8,
+    max_tokens=1200,
+    source="mlx_audio/tts/models/llama/llama.py (generate signature defaults)",
 )
